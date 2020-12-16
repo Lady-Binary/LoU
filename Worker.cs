@@ -7,7 +7,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace LOU
+namespace LoU
 {
     public class Worker : MonoBehaviour
     {

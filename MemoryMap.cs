@@ -4,7 +4,7 @@ using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Threading;
 
-namespace LOU
+namespace LoU
 {
     public class MemoryMap
     {

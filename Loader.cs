@@ -1,4 +1,4 @@
-﻿namespace LOU
+﻿namespace LoU
 {
     public class Loader
     {

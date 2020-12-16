@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LOU
+namespace LoU
 {
     public enum CommandType
     {
