@@ -1021,7 +1021,7 @@ namespace LoU
 
                     case CommandType.WaitForTarget:
                         {
-                            // This is implemented client side! See ScriptDebugger.cs in EasyLOU project
+                            // This is implemented client side! See ScriptDebugger.cs in EasyLoU project
                         }
                         break;
 
