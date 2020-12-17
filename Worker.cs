@@ -56,7 +56,7 @@ namespace LoU
 
         public void Start()
         {
-            Utils.Log("EasyLOU - " + Assembly.GetExecutingAssembly().GetName().Version.ToString() + " - LOU.dll started!");
+            Utils.Log("EasyLoU - " + Assembly.GetExecutingAssembly().GetName().Version.ToString() + " - LoU.dll started!");
 
             this.ProcessId = Process.GetCurrentProcess().Id;
             Utils.Log("ProcessId: " + this.ProcessId.ToString());

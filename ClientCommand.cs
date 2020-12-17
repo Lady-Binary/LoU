@@ -207,7 +207,7 @@ namespace LoU
         TargetSelf,
         //ArmDisarmLeft,
         //ArmDisarmRight,
-        WaitForTarget, // This is implemented client side! See ScriptDebugger.cs in EasyLOU project
+        WaitForTarget, // This is implemented client side! See ScriptDebugger.cs in EasyLoU project
         //TargetNext,
         //AttackLast,
         //Delay,
