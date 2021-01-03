@@ -47,6 +47,8 @@ namespace LoU
         private float ScanJournalTime;
         private string ScanJournalMessage;
 
+        private HashSet<String> RegisteredKeys;
+
         private bool leftMouseDown;
         private bool rightMouseDown;
 
@@ -56,6 +58,10 @@ namespace LoU
 
         public void Start()
         {
+
+
+            RegisteredKeys = new HashSet<String>();
+
             Utils.Log("EasyLoU - " + Assembly.GetExecutingAssembly().GetName().Version.ToString() + " - LoU.dll started!");
 
             this.ProcessId = Process.GetCurrentProcess().Id;
@@ -381,6 +387,16 @@ namespace LoU
                                     FloatingPanel.CloseWindow();
                                 }
                             }
+
+                            break;
+                        }
+
+                    case CommandType.RegisterHotKey:
+                        {
+                            var watch = new System.Diagnostics.Stopwatch();
+                            watch.Start();
+
+                            RegisteredKeys.Add(ExtractParam(ClientCommand.CommandParams, 0));
 
                             break;
                         }
@@ -1025,6 +1041,12 @@ namespace LoU
                         }
                         break;
 
+                    case CommandType.GetHotKey:
+                        {
+                            // This is implemented client side! See ScriptDebugger.cs in EasyLoU project
+                        }
+                        break;
+
                     case CommandType.AttackSelected:
                         {
                             string _objectId = ExtractParam(ClientCommand.CommandParams, 0);
@@ -1477,6 +1499,25 @@ namespace LoU
             ClientStatus ClientStatus = new ClientStatus();
             ClientStatus.TimeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
+            // Keypress Detection
+
+            if (RegisteredKeys.Count > 0)
+            {
+
+                List<ClientStatus.HOTKEYStruct> CheckedKeys = new List<ClientStatus.HOTKEYStruct>();
+
+                foreach (string RegisteredKey in RegisteredKeys)
+                {
+                    CheckedKeys.Add(new ClientStatus.HOTKEYStruct()
+                    {
+                        KEY = RegisteredKey,
+                        VALUE = Input.GetKey(RegisteredKey),
+                    });
+                }
+
+                ClientStatus.Miscellaneous.HOTKEYS = CheckedKeys.ToArray();
+            }
+
             //Utils.Log("Props:");
             //Dictionary<string, object> EBNBHBHNCFC = (Dictionary<string, object>)Utils.GetInstanceField(this.player, "EBNBHBHNCFC");
 
@@ -1776,7 +1817,7 @@ namespace LoU
                 }
 
                 //Utils.Log("update = " + update.ToString());
-                if (update > 0.5f)
+                if (update > 0.1f)
                 {
                     //Utils.Log("Update!");
                     update = 0;

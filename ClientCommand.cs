@@ -208,6 +208,7 @@ namespace LoU
         //ArmDisarmLeft,
         //ArmDisarmRight,
         WaitForTarget, // This is implemented client side! See ScriptDebugger.cs in EasyLoU project
+        GetHotKey, // This is implemented client side! See ScriptDebugger.cs in EasyLoU project
         //TargetNext,
         //AttackLast,
         //Delay,
@@ -275,7 +276,8 @@ namespace LoU
         SetCustomVar,
         ClearCustomVar,
         Logout,
-        ClosePanel
+        ClosePanel,
+        RegisterHotKey,
     }
 
     [ProtoContract]

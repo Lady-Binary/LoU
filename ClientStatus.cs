@@ -317,6 +317,14 @@ namespace LoU
             public int? PERMANENTID;
         }
         [ProtoContract]
+        public struct HOTKEYStruct
+        {
+            [ProtoMember(1)]
+            public string KEY;
+            [ProtoMember(2)]
+            public bool VALUE;
+        }
+        [ProtoContract]
         public struct UIStruct
         {
             [ProtoMember(1)]
@@ -389,6 +397,8 @@ namespace LoU
             public float? TIME;
             [ProtoMember(24)]
             public string TOOLTIPTEXT;
+            [ProtoMember(25)]
+            public HOTKEYStruct[] HOTKEYS;
         }
         [ProtoMember(7)]
         public MiscellaneousStruct Miscellaneous;
