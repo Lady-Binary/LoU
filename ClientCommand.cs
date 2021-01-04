@@ -279,6 +279,7 @@ namespace LoU
         Logout,
         ClosePanel,
         RegisterHotKey,
+        SetCommandsPerSecond,
     }
 
     [ProtoContract]

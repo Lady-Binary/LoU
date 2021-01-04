@@ -15,6 +15,7 @@ namespace LoU
         private bool Intercepting = false;
 
         private int ProcessId = -1;
+        private float updateFrequency = 0.5f;
 
         private Assembly AssemblyCSharp = null;
 
@@ -58,7 +59,6 @@ namespace LoU
 
         public void Start()
         {
-
 
             RegisteredKeys = new HashSet<String>();
 
@@ -1483,12 +1483,19 @@ namespace LoU
                         {
                             GameObjectSingleton<ApplicationController>.DJCGIMIDOPB.ExitGame(false, true);
                         }
-                        break; 
+                        break;
+
+                    case CommandType.SetCommandsPerSecond:
+                        {
+                            this.updateFrequency = float.Parse(ExtractParam(ClientCommand.CommandParams, 0)) / 1000;
+                            Utils.Log("Setting update frequency to: " + updateFrequency);
+                        }
+                        break;
 
                     default:
                         Utils.Log("Not Implemented!");
                         break;
-                    
+
                 }
             }
         }
@@ -1817,9 +1824,9 @@ namespace LoU
                 }
 
                 //Utils.Log("update = " + update.ToString());
-                if (update > 0.1f)
+                if (update > updateFrequency)
                 {
-                    //Utils.Log("Update!");
+                    //Utils.Log("Update frequency: " + updateFrequency);
                     update = 0;
 
                     var updateWatch = new System.Diagnostics.Stopwatch();
