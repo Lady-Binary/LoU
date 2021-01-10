@@ -15,7 +15,7 @@ namespace LoU
         private bool Intercepting = false;
 
         private int ProcessId = -1;
-        private float updateFrequency = 0.5f;
+        private float updateFrequency = 0.1f;
 
         private Assembly AssemblyCSharp = null;
 
