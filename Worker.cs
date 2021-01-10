@@ -1485,7 +1485,7 @@ namespace LoU
                         }
                         break;
 
-                    case CommandType.SetCommandsPerSecond:
+                    case CommandType.SetSpeed:
                         {
                             this.updateFrequency = float.Parse(ExtractParam(ClientCommand.CommandParams, 0)) / 1000;
                             Utils.Log("Setting update frequency to: " + updateFrequency);
