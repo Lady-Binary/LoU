@@ -61,7 +61,6 @@
     <Reference Include="MessageCore">
       <HintPath>libs\MessageCore.dll</HintPath>
     </Reference>
-    <Reference Include="PresentationCore" />
     <Reference Include="protobuf-net">
       <HintPath>libs\protobuf-net.dll</HintPath>
     </Reference>
@@ -91,7 +90,6 @@
     <Reference Include="UnityEngine.UI">
       <HintPath>libs\UnityEngine.UI.dll</HintPath>
     </Reference>
-    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientCommand.cs" />
