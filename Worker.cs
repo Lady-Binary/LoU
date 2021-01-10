@@ -15,6 +15,7 @@ namespace LoU
         private bool Intercepting = false;
 
         private int ProcessId = -1;
+        private float updateFrequency = 0.5f;
 
         private Assembly AssemblyCSharp = null;
 
@@ -47,6 +48,8 @@ namespace LoU
         private float ScanJournalTime;
         private string ScanJournalMessage;
 
+        private HashSet<String> RegisteredKeys;
+
         private bool leftMouseDown;
         private bool rightMouseDown;
 
@@ -56,6 +59,9 @@ namespace LoU
 
         public void Start()
         {
+
+            RegisteredKeys = new HashSet<String>();
+
             Utils.Log("EasyLoU - " + Assembly.GetExecutingAssembly().GetName().Version.ToString() + " - LoU.dll started!");
 
             this.ProcessId = Process.GetCurrentProcess().Id;
@@ -381,6 +387,16 @@ namespace LoU
                                     FloatingPanel.CloseWindow();
                                 }
                             }
+
+                            break;
+                        }
+
+                    case CommandType.RegisterHotKey:
+                        {
+                            var watch = new System.Diagnostics.Stopwatch();
+                            watch.Start();
+
+                            RegisteredKeys.Add(ExtractParam(ClientCommand.CommandParams, 0));
 
                             break;
                         }
@@ -1025,6 +1041,12 @@ namespace LoU
                         }
                         break;
 
+                    case CommandType.GetHotKey:
+                        {
+                            // This is implemented client side! See ScriptDebugger.cs in EasyLoU project
+                        }
+                        break;
+
                     case CommandType.AttackSelected:
                         {
                             string _objectId = ExtractParam(ClientCommand.CommandParams, 0);
@@ -1461,12 +1483,19 @@ namespace LoU
                         {
                             GameObjectSingleton<ApplicationController>.DJCGIMIDOPB.ExitGame(false, true);
                         }
-                        break; 
+                        break;
+
+                    case CommandType.SetCommandsPerSecond:
+                        {
+                            this.updateFrequency = float.Parse(ExtractParam(ClientCommand.CommandParams, 0)) / 1000;
+                            Utils.Log("Setting update frequency to: " + updateFrequency);
+                        }
+                        break;
 
                     default:
                         Utils.Log("Not Implemented!");
                         break;
-                    
+
                 }
             }
         }
@@ -1476,6 +1505,25 @@ namespace LoU
         {
             ClientStatus ClientStatus = new ClientStatus();
             ClientStatus.TimeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            // Keypress Detection
+
+            if (RegisteredKeys.Count > 0)
+            {
+
+                List<ClientStatus.HOTKEYStruct> CheckedKeys = new List<ClientStatus.HOTKEYStruct>();
+
+                foreach (string RegisteredKey in RegisteredKeys)
+                {
+                    CheckedKeys.Add(new ClientStatus.HOTKEYStruct()
+                    {
+                        KEY = RegisteredKey,
+                        VALUE = Input.GetKey(RegisteredKey),
+                    });
+                }
+
+                ClientStatus.Miscellaneous.HOTKEYS = CheckedKeys.ToArray();
+            }
 
             //Utils.Log("Props:");
             //Dictionary<string, object> EBNBHBHNCFC = (Dictionary<string, object>)Utils.GetInstanceField(this.player, "EBNBHBHNCFC");
@@ -1776,9 +1824,9 @@ namespace LoU
                 }
 
                 //Utils.Log("update = " + update.ToString());
-                if (update > 0.5f)
+                if (update > updateFrequency)
                 {
-                    //Utils.Log("Update!");
+                    //Utils.Log("Update frequency: " + updateFrequency);
                     update = 0;
 
                     var updateWatch = new System.Diagnostics.Stopwatch();

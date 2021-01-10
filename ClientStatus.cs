@@ -317,6 +317,14 @@ namespace LoU
             public int? PERMANENTID;
         }
         [ProtoContract]
+        public struct HOTKEYStruct
+        {
+            [ProtoMember(1)]
+            public string KEY;
+            [ProtoMember(2)]
+            public bool VALUE;
+        }
+        [ProtoContract]
         public struct UIStruct
         {
             [ProtoMember(1)]
@@ -358,36 +366,38 @@ namespace LoU
             [ProtoMember(8)]
             public Dictionary<string, CustomVarStruct> CUSTOMVARS;
             [ProtoMember(9)]
-            public bool? MONSTERSNEARBY;
+            public HOTKEYStruct[] HOTKEYS;
             [ProtoMember(10)]
-            public OBJStruct MOUSEOVEROBJ;
+            public bool? MONSTERSNEARBY;
             [ProtoMember(11)]
-            public UIStruct MOUSEOVERUI;
+            public OBJStruct MOUSEOVEROBJ;
             [ProtoMember(12)]
-            public float? MOUSEWINDOWPOSX;
+            public UIStruct MOUSEOVERUI;
             [ProtoMember(13)]
-            public float? MOUSEWINDOWPOSY;
+            public float? MOUSEWINDOWPOSX;
             [ProtoMember(14)]
-            public float? MOUSEWORLDPOSX;
+            public float? MOUSEWINDOWPOSY;
             [ProtoMember(15)]
-            public float? MOUSEWORLDPOSY;
+            public float? MOUSEWORLDPOSX;
             [ProtoMember(16)]
-            public float? MOUSEWORLDPOSZ;
+            public float? MOUSEWORLDPOSY;
             [ProtoMember(17)]
-            public NEARBYMONSTERStruct[] NEARBYMONSTERS;
+            public float? MOUSEWORLDPOSZ;
             [ProtoMember(18)]
-            public int? RANDOM;
+            public NEARBYMONSTERStruct[] NEARBYMONSTERS;
             [ProtoMember(19)]
-            public string SCANJOURNALMESSAGE;
+            public int? RANDOM;
             [ProtoMember(20)]
-            public float? SCANJOURNALTIME;
+            public string SCANJOURNALMESSAGE;
             [ProtoMember(21)]
-            public bool? TARGETLOADING;
+            public float? SCANJOURNALTIME;
             [ProtoMember(22)]
-            public string TARGETTYPE;
+            public bool? TARGETLOADING;
             [ProtoMember(23)]
-            public float? TIME;
+            public string TARGETTYPE;
             [ProtoMember(24)]
+            public float? TIME;
+            [ProtoMember(25)]
             public string TOOLTIPTEXT;
         }
         [ProtoMember(7)]
