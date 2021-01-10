@@ -208,7 +208,7 @@ namespace LoU
         //ArmDisarmLeft,
         //ArmDisarmRight,
         WaitForTarget, // This is implemented client side! See ScriptDebugger.cs in EasyLoU project
-        GetHotKey, // This is implemented client side! See ScriptDebugger.cs in EasyLoU project
+        IsHotKeyDown, // This is implemented client side! See ScriptDebugger.cs in EasyLoU project
         GetKeyPress, // This is implemented client side! See ScriptDebugger.cs in EasyLoU project
         //TargetNext,
         //AttackLast,

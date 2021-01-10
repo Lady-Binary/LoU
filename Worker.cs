@@ -1041,7 +1041,7 @@ namespace LoU
                         }
                         break;
 
-                    case CommandType.GetHotKey:
+                    case CommandType.IsHotKeyDown:
                         {
                             // This is implemented client side! See ScriptDebugger.cs in EasyLoU project
                         }
