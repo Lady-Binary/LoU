@@ -48,7 +48,7 @@ namespace LoU
         private float ScanJournalTime;
         private string ScanJournalMessage;
 
-        private HashSet<String> RegisteredKeys;
+        private HashSet<String> RegisteredKeys = new HashSet<String>();
         Dictionary<string, bool> CheckedKeys = new Dictionary<string, bool>();
 
         private bool leftMouseDown;
@@ -60,9 +60,6 @@ namespace LoU
 
         public void Start()
         {
-
-            RegisteredKeys = new HashSet<String>();
-
             Utils.Log("EasyLoU - " + Assembly.GetExecutingAssembly().GetName().Version.ToString() + " - LoU.dll started!");
 
             this.ProcessId = Process.GetCurrentProcess().Id;
@@ -1435,6 +1432,9 @@ namespace LoU
                             FindInputResults = null;
                             FindLabelResults = null;
                             FindMobileResults = null;
+
+                            RegisteredKeys = new HashSet<String>();
+                            CheckedKeys = new Dictionary<string, bool>();
 
                             CustomVars = null;
 
