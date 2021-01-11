@@ -399,6 +399,8 @@ namespace LoU
             public float? TIME;
             [ProtoMember(25)]
             public string TOOLTIPTEXT;
+            [ProtoMember(26)]
+            public float UPDATEFREQUENCY;
         }
         [ProtoMember(7)]
         public MiscellaneousStruct Miscellaneous;
