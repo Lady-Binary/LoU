@@ -124,6 +124,7 @@ namespace LoU
             this.FindMobileResults = null;
             this.CustomVars = null;
             this.lastMouseClickClientObject = null;
+            this.RegisteredKeys = null;
         }
 
         // For backward compatibility with old command implementations - params are always threated as string
@@ -223,7 +224,8 @@ namespace LoU
                                 {
                                     items[objectId.ToString()] = dynamicObject;
                                 }
-                            } else
+                            }
+                            else
                             {
                                 // Try by Name (and ContainerId if required)
                                 string objectName = ExtractParam(ClientCommand.CommandParams, 0);
@@ -240,7 +242,8 @@ namespace LoU
                                 }
                             }
 
-                            try {
+                            try
+                            {
                                 this.FindItemResults =
                                     items?.Select(f => new ClientStatus.FINDITEMStruct()
                                     {
@@ -299,7 +302,8 @@ namespace LoU
                                 }
                             }
 
-                            try {
+                            try
+                            {
                                 this.FindPermanentResults = permanentObjects?.Select(f => new ClientStatus.FINDPERMANENTStruct()
                                 {
                                     COLOR =
@@ -331,7 +335,8 @@ namespace LoU
                                 })
                                 .OrderBy(f => f.DISTANCE)
                                 .ToArray();
-                            } catch (Exception ex)
+                            }
+                            catch (Exception ex)
                             {
                                 this.FindPermanentResults = null;
                                 Utils.Log("Error building FindPermanentResults!");
@@ -352,14 +357,16 @@ namespace LoU
 
                             Dictionary<string, FloatingPanel> panels = Utils.FindPanelByName(_panelName);
 
-                            try {
+                            try
+                            {
                                 this.FindPanelResults =
                                     panels?.Select(f => new ClientStatus.FINDPANELStruct()
                                     {
                                         ID = f.Key
                                     })
                                     .ToArray();
-                            } catch (Exception ex)
+                            }
+                            catch (Exception ex)
                             {
                                 this.FindPanelResults = null;
                                 Utils.Log("Error building FindPanelResults!");
@@ -474,7 +481,7 @@ namespace LoU
                                                         // Calculate the collider's center, relative to the dynamic window
                                                         Vector3 ColliderPositionRelativeToDynamicWindow = Utils.CalculateRelativePosition(Collider.transform, dynamicWindow.transform);
                                                         Vector3 ColliderCenterRelativeToDynamicWindow = ColliderPositionRelativeToDynamicWindow + Collider.center;
-                                                        
+
                                                         // Calculate collider boundaries
                                                         float ColliderX1 = ColliderCenterRelativeToDynamicWindow.x - (Collider.size.x / 2);
                                                         float ColliderX2 = ColliderCenterRelativeToDynamicWindow.x + (Collider.size.x / 2);
@@ -702,7 +709,8 @@ namespace LoU
                                             }
                                         }
                                     }
-                                    else if (int.TryParse(_labelName, out int labelName)) {
+                                    else if (int.TryParse(_labelName, out int labelName))
+                                    {
                                         //////// Textual Search 1: find collider with given name, and corresponding labels
 
                                         // Let's search for a collider with the given name
@@ -802,8 +810,9 @@ namespace LoU
                                 }
                             }
 
-                            try {
-                                this.FindLabelResults = 
+                            try
+                            {
+                                this.FindLabelResults =
                                     labels.Select(f => new ClientStatus.FINDLABELStruct()
                                     {
                                         NAME = f.Key.ToString(),
@@ -1161,7 +1170,8 @@ namespace LoU
                                 {
                                     mobiles.Add(mobile);
                                 }
-                            } else
+                            }
+                            else
                             {
                                 // Try by Name and distance (if required)
                                 string name = ExtractParam(ClientCommand.CommandParams, 0);
@@ -1176,7 +1186,8 @@ namespace LoU
                                 }
                             }
 
-                            try {
+                            try
+                            {
                                 this.FindMobileResults =
                                     mobiles?.Select(f => new ClientStatus.FINDMOBILEStruct()
                                     {
@@ -1200,7 +1211,7 @@ namespace LoU
                                 Utils.Log(ex.ToString());
                             }
 
-                        break;
+                            break;
                         }
 
                     case CommandType.SetUsername:
@@ -1294,16 +1305,19 @@ namespace LoU
                                             Utils.Log("OnButtonClicked(" + objectFound.name + ")");
                                             dynamicWindow.OnButtonClicked(objectFound);
                                             break;
-                                        } else
+                                        }
+                                        else
                                         {
                                             Utils.Log("BoxCollider " + _buttonName + " not found!");
                                         }
-                                    } else
+                                    }
+                                    else
                                     {
                                         Utils.Log("FloatingPanel " + _containerName + " found, but no dynamic window?!");
                                     }
 
-                                } else
+                                }
+                                else
                                 {
                                     Utils.Log("FloatingPanel " + _containerName + " not found!");
                                 }
@@ -1439,7 +1453,8 @@ namespace LoU
                             string name = ExtractStringParam(ClientCommand.CommandParams, 0);
                             object value = ExtractObjectParam(ClientCommand.CommandParams, 1);
 
-                            if (!String.IsNullOrEmpty(name)) {
+                            if (!String.IsNullOrEmpty(name))
+                            {
                                 name = name.ToUpper();
 
                                 if (CustomVars == null)
@@ -1746,7 +1761,8 @@ namespace LoU
                     ClientStatus.Miscellaneous.MOUSEWORLDPOSY = null;
                     ClientStatus.Miscellaneous.MOUSEWORLDPOSZ = null;
                 }
-            } else
+            }
+            else
             {
                 ClientStatus.Miscellaneous.MOUSEWINDOWPOSX = null;
                 ClientStatus.Miscellaneous.MOUSEWINDOWPOSY = null;
@@ -1764,7 +1780,8 @@ namespace LoU
             {
                 ClientStatus.Miscellaneous.TARGETLOADING = inputController.MAHPFOEKHPO;
                 ClientStatus.Miscellaneous.TARGETTYPE = ((InputController.FBKEBHPKOIC)(Utils.GetInstanceField(inputController, "BFNLCIMBCJF") ?? InputController.FBKEBHPKOIC.None)).ToString();
-            } else
+            }
+            else
             {
                 ClientStatus.Miscellaneous.TARGETLOADING = null;
                 ClientStatus.Miscellaneous.TARGETTYPE = null;
@@ -1773,6 +1790,8 @@ namespace LoU
             ClientStatus.Miscellaneous.TIME = Time.time;
 
             ClientStatus.Miscellaneous.TOOLTIPTEXT = this.tooltipText;
+
+            ClientStatus.Miscellaneous.UPDATEFREQUENCY = this.updateFrequency;
 
             //Utils.Log("UpdateStatus!");
             if (this.ProcessId != -1 && ClientStatusMemoryMap != null)
@@ -1909,7 +1928,8 @@ namespace LoU
                     try
                     {
                         UpdateClientStatus();
-                    } catch (Exception ex)
+                    }
+                    catch (Exception ex)
                     {
                         Utils.Log("Error updating status: " + ex.ToString());
                     }
