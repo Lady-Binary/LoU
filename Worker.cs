@@ -203,8 +203,34 @@ namespace LoU
             if (ClientCommand != null && ClientCommand.TimeStamp != LastClientCommandTimestamp && ClientCommand.CommandType != CommandType.NOP)
             {
                 LastClientCommandTimestamp = ClientCommand.TimeStamp;
-                Utils.Log("New command " + ClientCommand.CommandType.ToString() + " received at " + LastClientCommandTimestamp.ToString() + "! Params:");
-                Utils.Log(string.Join(" ", ClientCommand.CommandParams));
+                try
+                {
+                    Utils.Log("New command " + ClientCommand.CommandType.ToString() + " received at " + LastClientCommandTimestamp.ToString() + "! Params:");
+                    foreach (var CommandParam in ClientCommand.CommandParams)
+                    {
+                        string CommandParamValue = "";
+                        switch (CommandParam.Value.CommandParamType)
+                        {
+                            case ClientCommand.CommandParamTypeEnum.Boolean:
+                                CommandParamValue += $"{CommandParam.Value.Boolean.ToString()}(Boolean)";
+                                break;
+                            case ClientCommand.CommandParamTypeEnum.Number:
+                                CommandParamValue += $"{CommandParam.Value.Number.ToString()}(Number)";
+                                break;
+                            case ClientCommand.CommandParamTypeEnum.String:
+                                CommandParamValue += $"{CommandParam.Value.String.ToString()}(String)";
+                                break;
+                            default:
+                                CommandParamValue += $"(Unknown)";
+                                break;
+                        }
+                        Utils.Log($"[{CommandParam.Key}] {CommandParamValue}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Utils.Log("Error logging params: " + ex.ToString());
+                }
                 switch (ClientCommand.CommandType)
                 {
                     case CommandType.FindItem:
