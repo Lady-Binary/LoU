@@ -49,6 +49,7 @@ namespace LoU
         private string ScanJournalMessage;
 
         private HashSet<String> RegisteredKeys;
+        Dictionary<string, bool> CheckedKeys = new Dictionary<string, bool>();
 
         private bool leftMouseDown;
         private bool rightMouseDown;
@@ -125,6 +126,7 @@ namespace LoU
             this.CustomVars = null;
             this.lastMouseClickClientObject = null;
             this.RegisteredKeys = null;
+            this.CheckedKeys = null;
         }
 
         // For backward compatibility with old command implementations - params are always threated as string
@@ -1521,23 +1523,17 @@ namespace LoU
             ClientStatus ClientStatus = new ClientStatus();
             ClientStatus.TimeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
-            // Keypress Detection
+            // Keypress Detection - check it at every frame and record keypresses, but then reset it when we update the gui
 
             if (RegisteredKeys.Count > 0)
             {
-
-                List<ClientStatus.HOTKEYStruct> CheckedKeys = new List<ClientStatus.HOTKEYStruct>();
-
-                foreach (string RegisteredKey in RegisteredKeys)
+                ClientStatus.Miscellaneous.HOTKEYS = RegisteredKeys.Select(RegisteredKey => new ClientStatus.HOTKEYStruct()
                 {
-                    CheckedKeys.Add(new ClientStatus.HOTKEYStruct()
-                    {
-                        KEY = RegisteredKey,
-                        VALUE = Input.GetKey(RegisteredKey),
-                    });
-                }
+                    KEY = RegisteredKey,
+                    VALUE = CheckedKeys.ContainsKey(RegisteredKey) && CheckedKeys[RegisteredKey],
+                }).ToArray();
 
-                ClientStatus.Miscellaneous.HOTKEYS = CheckedKeys.ToArray();
+                CheckedKeys.Clear();
             }
 
             //Utils.Log("Props:");
@@ -1809,6 +1805,19 @@ namespace LoU
             {
                 //Utils.Log("DeltaTime = " + Time.deltaTime.ToString());
                 update += Time.deltaTime;
+
+                // Keypress Detection - check it at every frame and record keypresses, but then reset it when we update the gui
+
+                if (RegisteredKeys.Count > 0)
+                {
+                    foreach (string RegisteredKey in RegisteredKeys)
+                    {
+                        if (Input.GetKey(RegisteredKey))
+                        {
+                            CheckedKeys[RegisteredKey] = true;
+                        }
+                    }
+                }
 
                 if (
                     Input.mousePosition != null &&
