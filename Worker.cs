@@ -15,6 +15,7 @@ namespace LoU
         private bool Intercepting = false;
 
         private int ProcessId = -1;
+        private float updateFrequency = 0.1f;
 
         private Assembly AssemblyCSharp = null;
 
@@ -46,6 +47,9 @@ namespace LoU
 
         private float ScanJournalTime;
         private string ScanJournalMessage;
+
+        private HashSet<String> RegisteredKeys = new HashSet<String>();
+        Dictionary<string, bool> CheckedKeys = new Dictionary<string, bool>();
 
         private bool leftMouseDown;
         private bool rightMouseDown;
@@ -118,6 +122,8 @@ namespace LoU
             this.FindMobileResults = null;
             this.CustomVars = null;
             this.lastMouseClickClientObject = null;
+            this.RegisteredKeys = null;
+            this.CheckedKeys = null;
         }
 
         // For backward compatibility with old command implementations - params are always threated as string
@@ -197,8 +203,34 @@ namespace LoU
             if (ClientCommand != null && ClientCommand.TimeStamp != LastClientCommandTimestamp && ClientCommand.CommandType != CommandType.NOP)
             {
                 LastClientCommandTimestamp = ClientCommand.TimeStamp;
-                Utils.Log("New command " + ClientCommand.CommandType.ToString() + " received at " + LastClientCommandTimestamp.ToString() + "! Params:");
-                Utils.Log(string.Join(" ", ClientCommand.CommandParams));
+                try
+                {
+                    Utils.Log("New command " + ClientCommand.CommandType.ToString() + " received at " + LastClientCommandTimestamp.ToString() + "! Params:");
+                    foreach (var CommandParam in ClientCommand.CommandParams)
+                    {
+                        string CommandParamValue = "";
+                        switch (CommandParam.Value.CommandParamType)
+                        {
+                            case ClientCommand.CommandParamTypeEnum.Boolean:
+                                CommandParamValue += $"{CommandParam.Value.Boolean.ToString()}(Boolean)";
+                                break;
+                            case ClientCommand.CommandParamTypeEnum.Number:
+                                CommandParamValue += $"{CommandParam.Value.Number.ToString()}(Number)";
+                                break;
+                            case ClientCommand.CommandParamTypeEnum.String:
+                                CommandParamValue += $"{CommandParam.Value.String.ToString()}(String)";
+                                break;
+                            default:
+                                CommandParamValue += $"(Unknown)";
+                                break;
+                        }
+                        Utils.Log($"[{CommandParam.Key}] {CommandParamValue}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Utils.Log("Error logging params: " + ex.ToString());
+                }
                 switch (ClientCommand.CommandType)
                 {
                     case CommandType.FindItem:
@@ -217,7 +249,8 @@ namespace LoU
                                 {
                                     items[objectId.ToString()] = dynamicObject;
                                 }
-                            } else
+                            }
+                            else
                             {
                                 // Try by Name (and ContainerId if required)
                                 string objectName = ExtractParam(ClientCommand.CommandParams, 0);
@@ -234,7 +267,8 @@ namespace LoU
                                 }
                             }
 
-                            try {
+                            try
+                            {
                                 this.FindItemResults =
                                     items?.Select(f => new ClientStatus.FINDITEMStruct()
                                     {
@@ -293,7 +327,8 @@ namespace LoU
                                 }
                             }
 
-                            try {
+                            try
+                            {
                                 this.FindPermanentResults = permanentObjects?.Select(f => new ClientStatus.FINDPERMANENTStruct()
                                 {
                                     COLOR =
@@ -325,7 +360,8 @@ namespace LoU
                                 })
                                 .OrderBy(f => f.DISTANCE)
                                 .ToArray();
-                            } catch (Exception ex)
+                            }
+                            catch (Exception ex)
                             {
                                 this.FindPermanentResults = null;
                                 Utils.Log("Error building FindPermanentResults!");
@@ -346,14 +382,16 @@ namespace LoU
 
                             Dictionary<string, FloatingPanel> panels = Utils.FindPanelByName(_panelName);
 
-                            try {
+                            try
+                            {
                                 this.FindPanelResults =
                                     panels?.Select(f => new ClientStatus.FINDPANELStruct()
                                     {
                                         ID = f.Key
                                     })
                                     .ToArray();
-                            } catch (Exception ex)
+                            }
+                            catch (Exception ex)
                             {
                                 this.FindPanelResults = null;
                                 Utils.Log("Error building FindPanelResults!");
@@ -381,6 +419,16 @@ namespace LoU
                                     FloatingPanel.CloseWindow();
                                 }
                             }
+
+                            break;
+                        }
+
+                    case CommandType.RegisterHotKey:
+                        {
+                            var watch = new System.Diagnostics.Stopwatch();
+                            watch.Start();
+
+                            RegisteredKeys.Add(ExtractParam(ClientCommand.CommandParams, 0));
 
                             break;
                         }
@@ -458,7 +506,7 @@ namespace LoU
                                                         // Calculate the collider's center, relative to the dynamic window
                                                         Vector3 ColliderPositionRelativeToDynamicWindow = Utils.CalculateRelativePosition(Collider.transform, dynamicWindow.transform);
                                                         Vector3 ColliderCenterRelativeToDynamicWindow = ColliderPositionRelativeToDynamicWindow + Collider.center;
-                                                        
+
                                                         // Calculate collider boundaries
                                                         float ColliderX1 = ColliderCenterRelativeToDynamicWindow.x - (Collider.size.x / 2);
                                                         float ColliderX2 = ColliderCenterRelativeToDynamicWindow.x + (Collider.size.x / 2);
@@ -686,7 +734,8 @@ namespace LoU
                                             }
                                         }
                                     }
-                                    else if (int.TryParse(_labelName, out int labelName)) {
+                                    else if (int.TryParse(_labelName, out int labelName))
+                                    {
                                         //////// Textual Search 1: find collider with given name, and corresponding labels
 
                                         // Let's search for a collider with the given name
@@ -786,8 +835,9 @@ namespace LoU
                                 }
                             }
 
-                            try {
-                                this.FindLabelResults = 
+                            try
+                            {
+                                this.FindLabelResults =
                                     labels.Select(f => new ClientStatus.FINDLABELStruct()
                                     {
                                         NAME = f.Key.ToString(),
@@ -1025,6 +1075,12 @@ namespace LoU
                         }
                         break;
 
+                    case CommandType.IsHotKeyDown:
+                        {
+                            // This is implemented client side! See ScriptDebugger.cs in EasyLoU project
+                        }
+                        break;
+
                     case CommandType.AttackSelected:
                         {
                             string _objectId = ExtractParam(ClientCommand.CommandParams, 0);
@@ -1139,7 +1195,8 @@ namespace LoU
                                 {
                                     mobiles.Add(mobile);
                                 }
-                            } else
+                            }
+                            else
                             {
                                 // Try by Name and distance (if required)
                                 string name = ExtractParam(ClientCommand.CommandParams, 0);
@@ -1154,7 +1211,8 @@ namespace LoU
                                 }
                             }
 
-                            try {
+                            try
+                            {
                                 this.FindMobileResults =
                                     mobiles?.Select(f => new ClientStatus.FINDMOBILEStruct()
                                     {
@@ -1178,7 +1236,7 @@ namespace LoU
                                 Utils.Log(ex.ToString());
                             }
 
-                        break;
+                            break;
                         }
 
                     case CommandType.SetUsername:
@@ -1272,16 +1330,19 @@ namespace LoU
                                             Utils.Log("OnButtonClicked(" + objectFound.name + ")");
                                             dynamicWindow.OnButtonClicked(objectFound);
                                             break;
-                                        } else
+                                        }
+                                        else
                                         {
                                             Utils.Log("BoxCollider " + _buttonName + " not found!");
                                         }
-                                    } else
+                                    }
+                                    else
                                     {
                                         Utils.Log("FloatingPanel " + _containerName + " found, but no dynamic window?!");
                                     }
 
-                                } else
+                                }
+                                else
                                 {
                                     Utils.Log("FloatingPanel " + _containerName + " not found!");
                                 }
@@ -1398,6 +1459,9 @@ namespace LoU
                             FindLabelResults = null;
                             FindMobileResults = null;
 
+                            RegisteredKeys = new HashSet<String>();
+                            CheckedKeys = new Dictionary<string, bool>();
+
                             CustomVars = null;
 
                             ScanJournalTime = 0;
@@ -1417,7 +1481,8 @@ namespace LoU
                             string name = ExtractStringParam(ClientCommand.CommandParams, 0);
                             object value = ExtractObjectParam(ClientCommand.CommandParams, 1);
 
-                            if (!String.IsNullOrEmpty(name)) {
+                            if (!String.IsNullOrEmpty(name))
+                            {
                                 name = name.ToUpper();
 
                                 if (CustomVars == null)
@@ -1461,12 +1526,19 @@ namespace LoU
                         {
                             GameObjectSingleton<ApplicationController>.DJCGIMIDOPB.ExitGame(false, true);
                         }
-                        break; 
+                        break;
+
+                    case CommandType.SetSpeed:
+                        {
+                            this.updateFrequency = 1 / float.Parse(ExtractParam(ClientCommand.CommandParams, 0));
+                            Utils.Log("Setting update frequency to: " + updateFrequency);
+                        }
+                        break;
 
                     default:
                         Utils.Log("Not Implemented!");
                         break;
-                    
+
                 }
             }
         }
@@ -1476,6 +1548,19 @@ namespace LoU
         {
             ClientStatus ClientStatus = new ClientStatus();
             ClientStatus.TimeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            // Keypress Detection - check it at every frame and record keypresses, but then reset it when we update the gui
+
+            if (RegisteredKeys.Count > 0)
+            {
+                ClientStatus.Miscellaneous.HOTKEYS = RegisteredKeys.Select(RegisteredKey => new ClientStatus.HOTKEYStruct()
+                {
+                    KEY = RegisteredKey,
+                    VALUE = CheckedKeys.ContainsKey(RegisteredKey) && CheckedKeys[RegisteredKey],
+                }).ToArray();
+
+                CheckedKeys.Clear();
+            }
 
             //Utils.Log("Props:");
             //Dictionary<string, object> EBNBHBHNCFC = (Dictionary<string, object>)Utils.GetInstanceField(this.player, "EBNBHBHNCFC");
@@ -1698,7 +1783,8 @@ namespace LoU
                     ClientStatus.Miscellaneous.MOUSEWORLDPOSY = null;
                     ClientStatus.Miscellaneous.MOUSEWORLDPOSZ = null;
                 }
-            } else
+            }
+            else
             {
                 ClientStatus.Miscellaneous.MOUSEWINDOWPOSX = null;
                 ClientStatus.Miscellaneous.MOUSEWINDOWPOSY = null;
@@ -1716,7 +1802,8 @@ namespace LoU
             {
                 ClientStatus.Miscellaneous.TARGETLOADING = inputController.MAHPFOEKHPO;
                 ClientStatus.Miscellaneous.TARGETTYPE = ((InputController.FBKEBHPKOIC)(Utils.GetInstanceField(inputController, "BFNLCIMBCJF") ?? InputController.FBKEBHPKOIC.None)).ToString();
-            } else
+            }
+            else
             {
                 ClientStatus.Miscellaneous.TARGETLOADING = null;
                 ClientStatus.Miscellaneous.TARGETTYPE = null;
@@ -1725,6 +1812,8 @@ namespace LoU
             ClientStatus.Miscellaneous.TIME = Time.time;
 
             ClientStatus.Miscellaneous.TOOLTIPTEXT = this.tooltipText;
+
+            ClientStatus.Miscellaneous.UPDATEFREQUENCY = this.updateFrequency;
 
             //Utils.Log("UpdateStatus!");
             if (this.ProcessId != -1 && ClientStatusMemoryMap != null)
@@ -1742,6 +1831,19 @@ namespace LoU
             {
                 //Utils.Log("DeltaTime = " + Time.deltaTime.ToString());
                 update += Time.deltaTime;
+
+                // Keypress Detection - check it at every frame and record keypresses, but then reset it when we update the gui
+
+                if (RegisteredKeys.Count > 0)
+                {
+                    foreach (string RegisteredKey in RegisteredKeys)
+                    {
+                        if (Input.GetKey(RegisteredKey))
+                        {
+                            CheckedKeys[RegisteredKey] = true;
+                        }
+                    }
+                }
 
                 if (
                     Input.mousePosition != null &&
@@ -1776,9 +1878,9 @@ namespace LoU
                 }
 
                 //Utils.Log("update = " + update.ToString());
-                if (update > 0.5f)
+                if (update > updateFrequency)
                 {
-                    //Utils.Log("Update!");
+                    //Utils.Log("Update frequency: " + updateFrequency);
                     update = 0;
 
                     var updateWatch = new System.Diagnostics.Stopwatch();
@@ -1861,7 +1963,8 @@ namespace LoU
                     try
                     {
                         UpdateClientStatus();
-                    } catch (Exception ex)
+                    }
+                    catch (Exception ex)
                     {
                         Utils.Log("Error updating status: " + ex.ToString());
                     }

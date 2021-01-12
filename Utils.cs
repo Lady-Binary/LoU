@@ -318,7 +318,7 @@ namespace LoU
 
         public static void Log(string s)
         {
-            string message = string.Format("{0} - LOU - {1}", DateTime.UtcNow.ToString("o"), s);
+            string message = string.Format("{0} - LoU - {1}", DateTime.UtcNow.ToString("o"), s);
             try
             {
                 System.Diagnostics.Debug.WriteLine(message);
