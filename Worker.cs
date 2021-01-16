@@ -1,8 +1,10 @@
 using CoreUtil;
+using Microsoft.Win32;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
@@ -19,6 +21,7 @@ namespace LoU
 
         private Assembly AssemblyCSharp = null;
 
+        private String GameDirectory;
         private String ClientStatusMemoryMapMutexName;
         private String ClientStatusMemoryMapName;
         private Int32 ClientStatusMemoryMapSize;
@@ -60,6 +63,36 @@ namespace LoU
 
         public void Start()
         {
+
+            RegistryKey SoftwareKey = Registry.CurrentUser.OpenSubKey("Software", true);
+
+            RegistryKey LoUKey = SoftwareKey.OpenSubKey("LoU", true);
+            if (LoUKey == null)
+            {
+                LoUKey = SoftwareKey.CreateSubKey("LoU", true);
+            }
+
+            GameDirectory = (string)LoUKey.GetValue("GameDirectory", "./");
+
+            string[] RequiredAssemblies = {
+                "Assembly-CSharp.dll",
+                "Assembly-CSharp-firstpass.dll",
+                "CoreUtil.dll",
+                "MessageCore.dll",
+                "protobuf-net.dll",
+                "UnityEngine.CoreModule.dll",
+                "UnityEngine.InputLegacyModule.dll",
+                "UnityEngine.InputModule.dll",
+                "UnityEngine.PhysicsModule.dll",
+                "UnityEngine.UI.dll",
+            };
+
+            foreach (string RequiredAssembly in RequiredAssemblies)
+            {
+                string FullAssemblyPath = GameDirectory + @"\Legends of Aria_Data\Managed\" + RequiredAssembly;
+                Assembly.LoadFile(FullAssemblyPath);
+            }
+
             Utils.Log("EasyLoU - " + Assembly.GetExecutingAssembly().GetName().Version.ToString() + " - LoU.dll started!");
 
             this.ProcessId = Process.GetCurrentProcess().Id;
