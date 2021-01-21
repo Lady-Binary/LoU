@@ -64,15 +64,7 @@ namespace LoU
 
         public void Start()
         {
-            RegistryKey SoftwareKey = Registry.CurrentUser.OpenSubKey("Software", true);
-
-            RegistryKey LoUKey = SoftwareKey.OpenSubKey("LoU", true);
-            if (LoUKey == null)
-            {
-                LoUKey = SoftwareKey.CreateSubKey("LoU", true);
-            }
-
-            GameDirectory = (string)LoUKey.GetValue("GameDirectory", "./");
+            GameDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
             // Load assemblies from LoA
             string[] UnityAssemblies = {
@@ -95,6 +87,7 @@ namespace LoU
             }
 
             Utils.Log("EasyLoU - " + Assembly.GetExecutingAssembly().GetName().Version.ToString() + " - LoU.dll started!");
+            Utils.Log("GameDirectory: " + GameDirectory);
 
             this.ProcessId = Process.GetCurrentProcess().Id;
             Utils.Log("ProcessId: " + this.ProcessId.ToString());
