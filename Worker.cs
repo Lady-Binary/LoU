@@ -65,45 +65,6 @@ namespace LoU
         public void Start()
         {
 
-            Utils.Log("Start");
-
-            RegistryKey SoftwareKey = Registry.CurrentUser.OpenSubKey("Software", true);
-
-            RegistryKey LoUKey = SoftwareKey.OpenSubKey("LoU", true);
-            if (LoUKey == null)
-            {
-                LoUKey = SoftwareKey.CreateSubKey("LoU", true);
-            }
-
-            // This is needed so a DLL from LoUAM can be loaded, there's probably a better way to do this?
-            // =========================================
-            RegistryKey LoUAMKey = SoftwareKey.OpenSubKey("LoUAM", true);
-            if (LoUAMKey == null)
-            {
-                LoUAMKey = SoftwareKey.CreateSubKey("LoUAM", true);
-            }
-
-            GameDirectory = (string)LoUKey.GetValue("GameDirectory", "./");
-            LoUAMDirectory = (string)LoUAMKey.GetValue("WorkingDirectory", "");
-
-            if (LoUAMDirectory != "")
-            {
-                string[] LoUAMAssemblies = {
-                    "Newtonsoft.Json.dll",
-                };
-
-                foreach (string LoUAMAssembly in LoUAMAssemblies)
-                {
-
-                    string FullAssemblyPath = LoUAMDirectory + @"\" + LoUAMAssembly;
-                    Utils.Log($"Attempting to load {FullAssemblyPath}");
-                    Assembly.LoadFile(FullAssemblyPath);
-                }
-
-            }
-           // =========================================
-
-
             // Load assemblies from LoA
             string[] UnityAssemblies = {
                 "Assembly-CSharp.dll",
