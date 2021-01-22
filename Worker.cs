@@ -64,6 +64,15 @@ namespace LoU
 
         public void Start()
         {
+            RegistryKey SoftwareKey = Registry.CurrentUser.OpenSubKey("Software", true);
+
+            RegistryKey LoUKey = SoftwareKey.OpenSubKey("LoU", true);
+            if (LoUKey == null)
+            {
+                LoUKey = SoftwareKey.CreateSubKey("LoU", true);
+            }
+
+            GameDirectory = (string)LoUKey.GetValue("GameDirectory", "./");
 
             // Load assemblies from LoA
             string[] UnityAssemblies = {
