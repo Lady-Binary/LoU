@@ -5,7 +5,10 @@ Assembly-CSharp.dll
 CoreUtil.dll
 MessageCore.dll
 protobuf-net.dll
+UnityEngine.AssetBundleModule.dll
 UnityEngine.CoreModule.dll
+UnityEngine.dll
+UnityEngine.ImageConversionModule.dll
 UnityEngine.InputLegacyModule.dll
 UnityEngine.InputModule.dll
 UnityEngine.PhysicsModule.dll
