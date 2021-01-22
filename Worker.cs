@@ -76,6 +76,7 @@ namespace LoU
                 "UnityEngine.CoreModule.dll",
                 "UnityEngine.InputLegacyModule.dll",
                 "UnityEngine.InputModule.dll",
+                "UnityEngine.JSONSerializeModule.dll",
                 "UnityEngine.PhysicsModule.dll",
                 "UnityEngine.UI.dll",
             };

@@ -1,14 +1,22 @@
-﻿using Microsoft.Win32;
-using Newtonsoft.Json;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
 namespace LoU
 {
+    [System.Serializable]
+    public class TileTransform
+    {
+        public string ParentName;
+        public string Name;
+        public float x;
+        public float y;
+        public float z;
+    }
+
     class MapExporter
     {
-
         public static void ExportTexture(Texture2D Texture, string mapDirectory)
         {
 
@@ -69,38 +77,18 @@ namespace LoU
                 {
                     Transform transform = children[i].transform;
 
-                    var localPositionDictionary = new System.Collections.Generic.Dictionary<string, object>
+                    TileTransform tileTransform = new TileTransform()
                     {
-                        ["X"] = transform.localPosition.x,
-                        ["Y"] = transform.localPosition.y,
-                        ["Z"] = transform.localPosition.z
-                    };
-                    var localRotationDictionary = new System.Collections.Generic.Dictionary<string, object>
-                    {
-                        ["X"] = transform.localRotation.x,
-                        ["Y"] = transform.localRotation.y,
-                        ["Z"] = transform.localRotation.z,
-                        ["W"] = transform.localRotation.w
-                    };
-                    var localScaleDictionary = new System.Collections.Generic.Dictionary<string, object>
-                    {
-                        ["X"] = transform.localScale.x,
-                        ["Y"] = transform.localScale.y,
-                        ["Z"] = transform.localScale.z,
+                        ParentName = transform.parent.name,
+                        Name = transform.name,
+                        x = transform.localPosition.x,
+                        y = transform.localPosition.y,
+                        z = transform.localPosition.z
                     };
 
-                    var transformDictionary = new System.Collections.Generic.Dictionary<string, object>
-                    {
-                        ["PathID"] = transform.name.ToString(),
-                        ["LocalPosition"] = localPositionDictionary,
-                        ["LocalRotation"] = localRotationDictionary,
-                        ["LocalScale"] = localScaleDictionary
-                    };
+                    string serializedTransform = JsonUtility.ToJson(tileTransform);
 
-
-                    string serializedTransform = JsonConvert.SerializeObject(transformDictionary);
-
-                    string exportFullName = Path.Combine(mapDirectory, Prefab.name.ToString().Replace("Minimap", "") + "_" + (i - 1) + ".transform");
+                    string exportFullName = Path.Combine(mapDirectory, Prefab.name.ToString().Replace("Minimap", "") + "_" + (i - 1) + ".json");
 
                     if (File.Exists(exportFullName))
                     {
