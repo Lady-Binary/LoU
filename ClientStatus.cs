@@ -368,38 +368,42 @@ namespace LoU
             [ProtoMember(9)]
             public HOTKEYStruct[] HOTKEYS;
             [ProtoMember(10)]
-            public bool? MONSTERSNEARBY;
+            public int? MAPTRANSFORMS;
             [ProtoMember(11)]
-            public OBJStruct MOUSEOVEROBJ;
+            public int? MAPTEXTURES;
             [ProtoMember(12)]
-            public UIStruct MOUSEOVERUI;
+            public bool? MONSTERSNEARBY;
             [ProtoMember(13)]
-            public float? MOUSEWINDOWPOSX;
+            public OBJStruct MOUSEOVEROBJ;
             [ProtoMember(14)]
-            public float? MOUSEWINDOWPOSY;
+            public UIStruct MOUSEOVERUI;
             [ProtoMember(15)]
-            public float? MOUSEWORLDPOSX;
+            public float? MOUSEWINDOWPOSX;
             [ProtoMember(16)]
-            public float? MOUSEWORLDPOSY;
+            public float? MOUSEWINDOWPOSY;
             [ProtoMember(17)]
-            public float? MOUSEWORLDPOSZ;
+            public float? MOUSEWORLDPOSX;
             [ProtoMember(18)]
-            public NEARBYMONSTERStruct[] NEARBYMONSTERS;
+            public float? MOUSEWORLDPOSY;
             [ProtoMember(19)]
-            public int? RANDOM;
+            public float? MOUSEWORLDPOSZ;
             [ProtoMember(20)]
-            public string SCANJOURNALMESSAGE;
+            public NEARBYMONSTERStruct[] NEARBYMONSTERS;
             [ProtoMember(21)]
-            public float? SCANJOURNALTIME;
+            public int? RANDOM;
             [ProtoMember(22)]
-            public bool? TARGETLOADING;
+            public string SCANJOURNALMESSAGE;
             [ProtoMember(23)]
-            public string TARGETTYPE;
+            public float? SCANJOURNALTIME;
             [ProtoMember(24)]
-            public float? TIME;
+            public bool? TARGETLOADING;
             [ProtoMember(25)]
-            public string TOOLTIPTEXT;
+            public string TARGETTYPE;
             [ProtoMember(26)]
+            public float? TIME;
+            [ProtoMember(27)]
+            public string TOOLTIPTEXT;
+            [ProtoMember(28)]
             public float UPDATEFREQUENCY;
         }
         [ProtoMember(7)]

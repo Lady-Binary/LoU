@@ -17,7 +17,7 @@ namespace LoU
 
     class MapExporter
     {
-        public static void ExportTexture(Texture2D Texture, string mapDirectory)
+        public static void ExportTexture2D(Texture2D Texture, string mapDirectory)
         {
 
             string exportFullName =  Path.Combine(mapDirectory, Texture.name + ".jpg");
@@ -66,42 +66,49 @@ namespace LoU
             System.Diagnostics.Debug.WriteLine(_bytes.Length / 1024 + "Kb was saved as: " + exportFullName);
         }
 
-        public static void ExportPrefab(GameObject Prefab, string mapDirectory)
+        public static void ExportTransform(Transform transform, string mapDirectory)
         {
+            if (transform.parent == null || transform.localPosition == null)
+                return;
 
-            List<GameObject> children = Prefab.GetAllChildrenIncludingSelf();
-
-            for (int i = 0; i < children.Count; i++)
+            TileTransform tileTransform = new TileTransform()
             {
-                if (i > 0)
-                {
-                    Transform transform = children[i].transform;
+                ParentName = transform.parent.name,
+                Name = transform.name,
+                x = transform.localPosition.x,
+                y = transform.localPosition.y,
+                z = transform.localPosition.z
+            };
 
-                    TileTransform tileTransform = new TileTransform()
-                    {
-                        ParentName = transform.parent.name,
-                        Name = transform.name,
-                        x = transform.localPosition.x,
-                        y = transform.localPosition.y,
-                        z = transform.localPosition.z
-                    };
+            string serializedTransform = JsonUtility.ToJson(tileTransform);
 
-                    string serializedTransform = JsonUtility.ToJson(tileTransform);
+            string exportName = transform.parent.name.ToString().Replace("Minimap", "");
+            switch (transform.name)
+            {
+                case "Quad 1.1":
+                    exportName += "_0";
+                    break;
+                case "Quad 1.-1":
+                    exportName += "_1";
+                    break;
+                case "Quad -1.1":
+                    exportName += "_2";
+                    break;
+                case "Quad -1.-1":
+                    exportName += "_3";
+                    break;
+            }
+            exportName += ".json";
 
-                    string exportFullName = Path.Combine(mapDirectory, Prefab.name.ToString().Replace("Minimap", "") + "_" + (i - 1) + ".json");
+            string exportFullName = Path.Combine(mapDirectory, exportName);
 
-                    if (File.Exists(exportFullName))
-                    {
-                        File.Delete(exportFullName);
-                    }
-
-                    File.WriteAllText(exportFullName, serializedTransform);
-                    System.Diagnostics.Debug.WriteLine(serializedTransform.Length + "b was saved as: " + exportFullName);
-                }
+            if (File.Exists(exportFullName))
+            {
+                File.Delete(exportFullName);
             }
 
-
+            File.WriteAllText(exportFullName, serializedTransform);
+            System.Diagnostics.Debug.WriteLine(serializedTransform.Length + "b was saved as: " + exportFullName);
         }
-
     }
 }

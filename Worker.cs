@@ -22,7 +22,6 @@ namespace LoU
         private Assembly AssemblyCSharp = null;
 
         private String GameDirectory;
-        private String LoUAMDirectory;
         private String ClientStatusMemoryMapMutexName;
         private String ClientStatusMemoryMapName;
         private Int32 ClientStatusMemoryMapSize;
@@ -61,6 +60,9 @@ namespace LoU
         private Vector3 lastMouseClickPosition;
         private ClientObject lastMouseClickClientObject;
         private string tooltipText;
+
+        Transform[] MapTransforms;
+        Texture2D[] MapTextures;
 
         public void Start()
         {
@@ -261,29 +263,62 @@ namespace LoU
                 }
                 switch (ClientCommand.CommandType)
                 {
+                    case CommandType.LoadMap:
+                        {
+                            var watch = new System.Diagnostics.Stopwatch();
+
+                            watch.Start();
+                            MapTransforms = Resources.LoadAll<GameObject>("prefabs/minimaps/newceladormaps/").SelectMany(g => g.GetComponentsInChildren<Transform>()).Where(t => t.parent != null && t.localPosition != null).ToArray();
+
+                            Utils.Log($"LoadAll<GameObject>() took {watch.ElapsedMilliseconds.ToString()}ms, {MapTransforms.Length} loaded.");
+                            watch.Reset();
+
+                            watch.Start();
+                            MapTextures = Resources.LoadAll<Texture2D>("prefabs/minimaps/newceladormaps/");
+
+                            Utils.Log($"LoadAll<Texture2D>() took {watch.ElapsedMilliseconds.ToString()}ms, {MapTextures.Length} loaded.");
+                            watch.Stop();
+
+                            break;
+                        }
 
                     case CommandType.ExportMap:
                         {
+                            var watch = new System.Diagnostics.Stopwatch();
 
-                            if (LoUAMDirectory != "./")
+                            string mapDirectory = ExtractParam(ClientCommand.CommandParams, 0);
+
+                            watch.Start();
+                            foreach (Transform transform in MapTransforms)
                             {
-                                string mapDirectory = ExtractParam(ClientCommand.CommandParams, 0);
-
-                                UnityEngine.Object[] textures = Resources.LoadAll("prefabs/minimaps/newceladormaps/", typeof(Texture2D));
-                                foreach (Texture2D texture in textures)
-                                {
-                                    MapExporter.ExportTexture(texture, mapDirectory);
-                                }
-
-                                UnityEngine.Object[] prefabs = Resources.LoadAll("prefabs/minimaps/newceladormaps/", typeof(GameObject));
-                                foreach (GameObject prefab in prefabs)
-                                {
-                                    MapExporter.ExportPrefab(prefab, mapDirectory);
-                                }
-
-                                Resources.UnloadUnusedAssets();
+                                MapExporter.ExportTransform(transform, mapDirectory);
                             }
 
+                            Utils.Log("ExportTransform() took " + watch.ElapsedMilliseconds.ToString() + "ms");
+                            watch.Reset();
+
+                            watch.Start();
+                            foreach (Texture2D texture in MapTextures)
+                            {
+                                MapExporter.ExportTexture2D(texture, mapDirectory);
+                            }
+
+                            Utils.Log("ExportTexture2D() took " + watch.ElapsedMilliseconds.ToString() + "ms");
+                            watch.Stop();
+                            break;
+                        }
+
+                    case CommandType.UnloadMap:
+                        {
+                            var watch = new System.Diagnostics.Stopwatch();
+
+                            watch.Start();
+                            MapTransforms = null;
+                            MapTextures = null;
+                            Resources.UnloadUnusedAssets();
+
+                            Utils.Log("UnloadUnusedAssets() took " + watch.ElapsedMilliseconds.ToString() + "ms");
+                            watch.Stop();
                             break;
                         }
 
@@ -1771,6 +1806,9 @@ namespace LoU
             ClientStatus.Miscellaneous.COMMANDID = this.ClientCommandId;
 
             ClientStatus.Miscellaneous.CUSTOMVARS = this.CustomVars?.ToDictionary(v => v.Key, v => new ClientStatus.CustomVarStruct(v.Value)) ?? null;
+
+            ClientStatus.Miscellaneous.MAPTRANSFORMS = this.MapTransforms?.Length ?? 0;
+            ClientStatus.Miscellaneous.MAPTEXTURES = this.MapTextures?.Length ?? 0;
 
             if (this.player != null)
             {
