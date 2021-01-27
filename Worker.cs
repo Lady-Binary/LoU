@@ -1,8 +1,10 @@
 using CoreUtil;
+using Microsoft.Win32;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
@@ -11,8 +13,8 @@ namespace LoU
 {
     public class Worker : MonoBehaviour
     {
-        private const bool VERBOSE_DEBUG = false;
-        private bool Intercepting = false;
+        private const bool VERBOSE_DEBUG = true;
+        private bool Intercepting = true;
 
         private int ProcessId = -1;
         private float updateFrequency = 0.1f;
@@ -58,9 +60,12 @@ namespace LoU
         private ClientObject lastMouseClickClientObject;
         private string tooltipText;
 
+        Transform[] MapTransforms;
+        Texture2D[] MapTextures;
+
         public void Start()
         {
-            Utils.Log("EasyLoU - " + Assembly.GetExecutingAssembly().GetName().Version.ToString() + " - LoU.dll started!");
+            Utils.Log("LoU.dll started!");
 
             this.ProcessId = Process.GetCurrentProcess().Id;
             Utils.Log("ProcessId: " + this.ProcessId.ToString());
@@ -233,6 +238,65 @@ namespace LoU
                 }
                 switch (ClientCommand.CommandType)
                 {
+                    case CommandType.LoadMap:
+                        {
+                            var watch = new System.Diagnostics.Stopwatch();
+
+                            watch.Start();
+                            MapTransforms = Resources.LoadAll<GameObject>("prefabs/minimaps/newceladormaps/").SelectMany(g => g.GetComponentsInChildren<Transform>()).Where(t => t.parent != null && t.localPosition != null).ToArray();
+
+                            Utils.Log($"LoadAll<GameObject>() took {watch.ElapsedMilliseconds.ToString()}ms, {MapTransforms.Length} loaded.");
+                            watch.Reset();
+
+                            watch.Start();
+                            MapTextures = Resources.LoadAll<Texture2D>("prefabs/minimaps/newceladormaps/");
+
+                            Utils.Log($"LoadAll<Texture2D>() took {watch.ElapsedMilliseconds.ToString()}ms, {MapTextures.Length} loaded.");
+                            watch.Stop();
+
+                            break;
+                        }
+
+                    case CommandType.ExportMap:
+                        {
+                            var watch = new System.Diagnostics.Stopwatch();
+
+                            string mapDirectory = ExtractParam(ClientCommand.CommandParams, 0);
+
+                            watch.Start();
+                            foreach (Transform transform in MapTransforms)
+                            {
+                                MapExporter.ExportTransform(transform, mapDirectory);
+                            }
+
+                            Utils.Log("ExportTransform() took " + watch.ElapsedMilliseconds.ToString() + "ms");
+                            watch.Reset();
+
+                            watch.Start();
+                            foreach (Texture2D texture in MapTextures)
+                            {
+                                MapExporter.ExportTexture2D(texture, mapDirectory);
+                            }
+
+                            Utils.Log("ExportTexture2D() took " + watch.ElapsedMilliseconds.ToString() + "ms");
+                            watch.Stop();
+                            break;
+                        }
+
+                    case CommandType.UnloadMap:
+                        {
+                            var watch = new System.Diagnostics.Stopwatch();
+
+                            watch.Start();
+                            MapTransforms = null;
+                            MapTextures = null;
+                            Resources.UnloadUnusedAssets();
+
+                            Utils.Log("UnloadUnusedAssets() took " + watch.ElapsedMilliseconds.ToString() + "ms");
+                            watch.Stop();
+                            break;
+                        }
+
                     case CommandType.FindItem:
                         {
                             var watch = new System.Diagnostics.Stopwatch();
@@ -1717,6 +1781,9 @@ namespace LoU
             ClientStatus.Miscellaneous.COMMANDID = this.ClientCommandId;
 
             ClientStatus.Miscellaneous.CUSTOMVARS = this.CustomVars?.ToDictionary(v => v.Key, v => new ClientStatus.CustomVarStruct(v.Value)) ?? null;
+
+            ClientStatus.Miscellaneous.MAPTRANSFORMS = this.MapTransforms?.Length ?? 0;
+            ClientStatus.Miscellaneous.MAPTEXTURES = this.MapTextures?.Length ?? 0;
 
             if (this.player != null)
             {

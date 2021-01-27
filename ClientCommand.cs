@@ -280,6 +280,9 @@ namespace LoU
         ClosePanel,
         RegisterHotKey,
         SetSpeed,
+        LoadMap,
+        ExportMap,
+        UnloadMap
     }
 
     [ProtoContract]
