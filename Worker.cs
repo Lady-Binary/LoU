@@ -21,7 +21,6 @@ namespace LoU
 
         private Assembly AssemblyCSharp = null;
 
-        private String GameDirectory;
         private String ClientStatusMemoryMapMutexName;
         private String ClientStatusMemoryMapName;
         private Int32 ClientStatusMemoryMapSize;
@@ -66,31 +65,7 @@ namespace LoU
 
         public void Start()
         {
-            GameDirectory = AppDomain.CurrentDomain.BaseDirectory;
-
-            // Load assemblies from LoA
-            string[] UnityAssemblies = {
-                "Assembly-CSharp.dll",
-                "Assembly-CSharp-firstpass.dll",
-                "CoreUtil.dll",
-                "MessageCore.dll",
-                "protobuf-net.dll",
-                "UnityEngine.CoreModule.dll",
-                "UnityEngine.InputLegacyModule.dll",
-                "UnityEngine.InputModule.dll",
-                "UnityEngine.JSONSerializeModule.dll",
-                "UnityEngine.PhysicsModule.dll",
-                "UnityEngine.UI.dll",
-            };
-
-            foreach (string UnityAssembly in UnityAssemblies)
-            {
-                string FullAssemblyPath = GameDirectory + @"\Legends of Aria_Data\Managed\" + UnityAssembly;
-                Assembly.LoadFile(FullAssemblyPath);
-            }
-
-            Utils.Log("EasyLoU - " + Assembly.GetExecutingAssembly().GetName().Version.ToString() + " - LoU.dll started!");
-            Utils.Log("GameDirectory: " + GameDirectory);
+            Utils.Log("LoU.dll started!");
 
             this.ProcessId = Process.GetCurrentProcess().Id;
             Utils.Log("ProcessId: " + this.ProcessId.ToString());
