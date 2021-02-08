@@ -309,6 +309,34 @@ namespace LoU
         [ProtoContract]
         public struct CommandParamStruct
         {
+            public CommandParamStruct(object value)
+            {
+                if (IsBoolean(value))
+                {
+                    this.CommandParamType = CommandParamTypeEnum.Boolean;
+                    this.Boolean = (bool)value;
+                    this.Number = 0;
+                    this.String = "";
+                }
+                else if (IsNumber(value))
+                {
+                    this.CommandParamType = CommandParamTypeEnum.Number;
+                    this.Boolean = false;
+                    this.Number = (double)value;
+                    this.String = "";
+                }
+                else if (IsString(value))
+                {
+                    this.CommandParamType = CommandParamTypeEnum.String;
+                    this.Boolean = false;
+                    this.Number = 0;
+                    this.String = (string)value;
+                } else
+                {
+                    throw new Exception($"Unsupported value: {value}");
+                }
+            }
+
             [ProtoMember(1)]
             public CommandParamTypeEnum CommandParamType;
             [ProtoMember(2)]
@@ -329,6 +357,38 @@ namespace LoU
         {
             this.TimeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
             this.CommandType = CommandType;
+        }
+        public ClientCommand(CommandType CommandType, string param1Name, object param1Value)
+        {
+            this.TimeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+            this.CommandType = CommandType;
+            this.CommandParams = new Dictionary<string, CommandParamStruct>()
+            {
+                { param1Name, new CommandParamStruct(param1Value) }
+            };
+        }
+
+        private static bool IsBoolean(object value)
+        {
+            return value is bool;
+        }
+        private static bool IsNumber(object value)
+        {
+            return value is sbyte
+                    || value is byte
+                    || value is short
+                    || value is ushort
+                    || value is int
+                    || value is uint
+                    || value is long
+                    || value is ulong
+                    || value is float
+                    || value is double
+                    || value is decimal;
+        }
+        private static bool IsString(object value)
+        {
+            return value is string;
         }
     }
 }
