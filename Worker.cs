@@ -13,8 +13,8 @@ namespace LoU
 {
     public class Worker : MonoBehaviour
     {
-        private const bool VERBOSE_DEBUG = true;
-        private bool Intercepting = true;
+        private const bool VERBOSE_DEBUG = false;
+        private bool Intercepting = false;
 
         private int ProcessId = -1;
         private float updateFrequency = 0.1f;
@@ -60,8 +60,9 @@ namespace LoU
         private ClientObject lastMouseClickClientObject;
         private string tooltipText;
 
-        Transform[] MapTransforms;
-        Texture2D[] MapTextures;
+        private string loadedMapRegion;
+        Transform[] loadedMapTransforms;
+        Texture2D[] loadedMapTextures;
 
         public void Start()
         {
@@ -129,6 +130,9 @@ namespace LoU
             this.lastMouseClickClientObject = null;
             this.RegisteredKeys = null;
             this.CheckedKeys = null;
+            this.loadedMapRegion = null;
+            this.loadedMapTextures = null;
+            this.loadedMapTransforms = null;
         }
 
         // For backward compatibility with old command implementations - params are always threated as string
@@ -242,16 +246,19 @@ namespace LoU
                         {
                             var watch = new System.Diagnostics.Stopwatch();
 
-                            watch.Start();
-                            MapTransforms = Resources.LoadAll<GameObject>("prefabs/minimaps/newceladormaps/").SelectMany(g => g.GetComponentsInChildren<Transform>()).Where(t => t.parent != null && t.localPosition != null).ToArray();
+                            string region = ExtractParam(ClientCommand.CommandParams, 0);
+                            loadedMapRegion = region;
 
-                            Utils.Log($"LoadAll<GameObject>() took {watch.ElapsedMilliseconds.ToString()}ms, {MapTransforms.Length} loaded.");
+                            watch.Start();
+                            loadedMapTransforms = Resources.LoadAll<Transform>($"Prefabs/Minimaps/{loadedMapRegion}/").SelectMany(g => g.transform.Cast<Transform>()).ToArray();
+
+                            Utils.Log($"LoadAll<Transform>({loadedMapRegion}) took {watch.ElapsedMilliseconds.ToString()}ms, {loadedMapTransforms.Length} loaded.");
                             watch.Reset();
 
                             watch.Start();
-                            MapTextures = Resources.LoadAll<Texture2D>("prefabs/minimaps/newceladormaps/");
+                            loadedMapTextures = Resources.LoadAll<Texture2D>($"Prefabs/Minimaps/{loadedMapRegion}/");
 
-                            Utils.Log($"LoadAll<Texture2D>() took {watch.ElapsedMilliseconds.ToString()}ms, {MapTextures.Length} loaded.");
+                            Utils.Log($"LoadAll<Texture2D>({loadedMapRegion}) took {watch.ElapsedMilliseconds.ToString()}ms, {loadedMapTextures.Length} loaded.");
                             watch.Stop();
 
                             break;
@@ -264,21 +271,21 @@ namespace LoU
                             string mapDirectory = ExtractParam(ClientCommand.CommandParams, 0);
 
                             watch.Start();
-                            foreach (Transform transform in MapTransforms)
+                            foreach (Transform transform in loadedMapTransforms)
                             {
                                 MapExporter.ExportTransform(transform, mapDirectory);
                             }
 
-                            Utils.Log("ExportTransform() took " + watch.ElapsedMilliseconds.ToString() + "ms");
+                            Utils.Log($"ExportTransform({loadedMapRegion}) took " + watch.ElapsedMilliseconds.ToString() + "ms");
                             watch.Reset();
 
                             watch.Start();
-                            foreach (Texture2D texture in MapTextures)
+                            foreach (Texture2D texture in loadedMapTextures)
                             {
                                 MapExporter.ExportTexture2D(texture, mapDirectory);
                             }
 
-                            Utils.Log("ExportTexture2D() took " + watch.ElapsedMilliseconds.ToString() + "ms");
+                            Utils.Log($"ExportTexture2D({loadedMapRegion}) took " + watch.ElapsedMilliseconds.ToString() + "ms");
                             watch.Stop();
                             break;
                         }
@@ -288,8 +295,10 @@ namespace LoU
                             var watch = new System.Diagnostics.Stopwatch();
 
                             watch.Start();
-                            MapTransforms = null;
-                            MapTextures = null;
+
+                            loadedMapRegion = null;
+                            loadedMapTransforms = null;
+                            loadedMapTextures = null;
                             Resources.UnloadUnusedAssets();
 
                             Utils.Log("UnloadUnusedAssets() took " + watch.ElapsedMilliseconds.ToString() + "ms");
@@ -1537,6 +1546,10 @@ namespace LoU
                             lastMouseClickPosition = new Vector3();
                             lastMouseClickClientObject = null;
                             tooltipText = null;
+
+                            loadedMapRegion = null;
+                            loadedMapTextures = null;
+                            loadedMapTransforms = null;
                         }
                         break;
 
@@ -1712,6 +1725,8 @@ namespace LoU
             ClientStatus.CharacterInfo.LEFTHANDID = this.player?.GetEquippedObject("LeftHand")?.DMCIODGEHCN;
             ClientStatus.CharacterInfo.LEFTHANDNAME = this.player?.GetEquippedObject("LeftHand")?.GetComponent<DynamicObject>()?.EBHEDGHBHGI;
 
+            ClientStatus.CharacterInfo.REGION = this.applicationController?.CGFLLIPKJCD;
+
             // Status Bar
 
             ClientStatus.StatusBar.STR = this.player?.GetStatByName("Str");
@@ -1782,8 +1797,9 @@ namespace LoU
 
             ClientStatus.Miscellaneous.CUSTOMVARS = this.CustomVars?.ToDictionary(v => v.Key, v => new ClientStatus.CustomVarStruct(v.Value)) ?? null;
 
-            ClientStatus.Miscellaneous.MAPTRANSFORMS = this.MapTransforms?.Length ?? 0;
-            ClientStatus.Miscellaneous.MAPTEXTURES = this.MapTextures?.Length ?? 0;
+            ClientStatus.Miscellaneous.LOADEDMAPREGION = this.loadedMapRegion ?? "";
+            ClientStatus.Miscellaneous.LOADEDMAPTRANSFORMS = this.loadedMapTransforms?.Length ?? 0;
+            ClientStatus.Miscellaneous.LOADEDMAPTEXTURES = this.loadedMapTextures?.Length ?? 0;
 
             if (this.player != null)
             {

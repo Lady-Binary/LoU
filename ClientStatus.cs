@@ -52,8 +52,10 @@ namespace LoU
             [ProtoMember(19)]
             public string LEGSNAME;
             [ProtoMember(20)]
-            public ulong? RIGHTHANDID;
+            public string REGION;
             [ProtoMember(21)]
+            public ulong? RIGHTHANDID;
+            [ProtoMember(22)]
             public string RIGHTHANDNAME;
         }
         [ProtoMember(2)]
@@ -368,42 +370,44 @@ namespace LoU
             [ProtoMember(9)]
             public HOTKEYStruct[] HOTKEYS;
             [ProtoMember(10)]
-            public int? MAPTRANSFORMS;
+            public string LOADEDMAPREGION;
             [ProtoMember(11)]
-            public int? MAPTEXTURES;
+            public int? LOADEDMAPTEXTURES;
             [ProtoMember(12)]
-            public bool? MONSTERSNEARBY;
+            public int? LOADEDMAPTRANSFORMS;
             [ProtoMember(13)]
-            public OBJStruct MOUSEOVEROBJ;
+            public bool? MONSTERSNEARBY;
             [ProtoMember(14)]
-            public UIStruct MOUSEOVERUI;
+            public OBJStruct MOUSEOVEROBJ;
             [ProtoMember(15)]
-            public float? MOUSEWINDOWPOSX;
+            public UIStruct MOUSEOVERUI;
             [ProtoMember(16)]
-            public float? MOUSEWINDOWPOSY;
+            public float? MOUSEWINDOWPOSX;
             [ProtoMember(17)]
-            public float? MOUSEWORLDPOSX;
+            public float? MOUSEWINDOWPOSY;
             [ProtoMember(18)]
-            public float? MOUSEWORLDPOSY;
+            public float? MOUSEWORLDPOSX;
             [ProtoMember(19)]
-            public float? MOUSEWORLDPOSZ;
+            public float? MOUSEWORLDPOSY;
             [ProtoMember(20)]
-            public NEARBYMONSTERStruct[] NEARBYMONSTERS;
+            public float? MOUSEWORLDPOSZ;
             [ProtoMember(21)]
-            public int? RANDOM;
+            public NEARBYMONSTERStruct[] NEARBYMONSTERS;
             [ProtoMember(22)]
-            public string SCANJOURNALMESSAGE;
+            public int? RANDOM;
             [ProtoMember(23)]
-            public float? SCANJOURNALTIME;
+            public string SCANJOURNALMESSAGE;
             [ProtoMember(24)]
-            public bool? TARGETLOADING;
+            public float? SCANJOURNALTIME;
             [ProtoMember(25)]
-            public string TARGETTYPE;
+            public bool? TARGETLOADING;
             [ProtoMember(26)]
-            public float? TIME;
+            public string TARGETTYPE;
             [ProtoMember(27)]
-            public string TOOLTIPTEXT;
+            public float? TIME;
             [ProtoMember(28)]
+            public string TOOLTIPTEXT;
+            [ProtoMember(29)]
             public float UPDATEFREQUENCY;
         }
         [ProtoMember(7)]
