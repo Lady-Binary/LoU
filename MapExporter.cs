@@ -6,9 +6,8 @@ using UnityEngine;
 namespace LoU
 {
     [System.Serializable]
-    public class TileTransform
+    public class Tile
     {
-        public string ParentName;
         public string Name;
         public float x;
         public float y;
@@ -17,11 +16,16 @@ namespace LoU
 
     class MapExporter
     {
-        public static void ExportTexture2D(Texture2D Texture, string mapDirectory)
+        public static void ExportTileProps(Tile tile, string exportFullName)
         {
+            string serializedTile = JsonUtility.ToJson(tile);
+            if (File.Exists(exportFullName))
+                File.Delete(exportFullName);
+            File.WriteAllText(exportFullName, serializedTile);
+        }
 
-            string exportFullName =  Path.Combine(mapDirectory, Texture.name + ".jpg");
-
+        public static void ExportTexture2D(Texture2D Texture, string exportFullName)
+        {
             // The games Texture2D objects have isReadable set to false so we need to copy them into a temporary object
             // with isReadable set to true so ImageConversion.EncodeToJPG can read them.
 
@@ -58,57 +62,39 @@ namespace LoU
             byte[] _bytes = ImageConversion.EncodeToJPG(readableTexture, 50);
 
             if (File.Exists(exportFullName))
-            {
                 File.Delete(exportFullName);
-            }
 
             File.WriteAllBytes(exportFullName, _bytes);
             System.Diagnostics.Debug.WriteLine(_bytes.Length / 1024 + "Kb was saved as: " + exportFullName);
         }
 
-        public static void ExportTransform(Transform transform, string mapDirectory)
+        public static void ExportTile(Renderer renderer, string mapDirectory)
         {
-            if (transform.parent == null || transform.localPosition == null)
+            if (renderer == null)
                 return;
 
-            TileTransform tileTransform = new TileTransform()
+            var texture = renderer?.material?.mainTexture as Texture2D;
+            if (texture == null)
+                return;
+
+            Tile tile = new Tile()
             {
-                ParentName = transform.parent.name,
-                Name = transform.name,
-                x = transform.localPosition.x,
-                y = transform.localPosition.y,
-                z = transform.localPosition.z
+                Name = texture.name,
+                x = renderer.bounds.center.x,
+                y = renderer.bounds.center.y,
+                z = renderer.bounds.center.z
             };
 
-            string serializedTransform = JsonUtility.ToJson(tileTransform);
-
-            string exportName = transform.parent.name.ToString().Replace("Minimap", "");
-            switch (transform.name)
+            var exportFullName = Path.Combine(mapDirectory, texture.name + "_" + renderer.name);
+            try
             {
-                case "Quad 1.1":
-                    exportName += "_0";
-                    break;
-                case "Quad 1.-1":
-                    exportName += "_1";
-                    break;
-                case "Quad -1.1":
-                    exportName += "_2";
-                    break;
-                case "Quad -1.-1":
-                    exportName += "_3";
-                    break;
-            }
-            exportName += ".json";
-
-            string exportFullName = Path.Combine(mapDirectory, exportName);
-
-            if (File.Exists(exportFullName))
+                ExportTileProps(tile, exportFullName + ".json");
+                ExportTexture2D(texture, exportFullName + ".jpg");
+            } catch(Exception ex)
             {
-                File.Delete(exportFullName);
+                Utils.Log($"Cannot export tile {exportFullName}:");
+                Utils.Log(ex.ToString());
             }
-
-            File.WriteAllText(exportFullName, serializedTransform);
-            System.Diagnostics.Debug.WriteLine(serializedTransform.Length + "b was saved as: " + exportFullName);
         }
     }
 }
