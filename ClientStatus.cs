@@ -372,42 +372,40 @@ namespace LoU
             [ProtoMember(10)]
             public string LOADEDMAPREGION;
             [ProtoMember(11)]
-            public int? LOADEDMAPTEXTURES;
+            public int? LOADEDMAPTILES;
             [ProtoMember(12)]
-            public int? LOADEDMAPTRANSFORMS;
-            [ProtoMember(13)]
             public bool? MONSTERSNEARBY;
-            [ProtoMember(14)]
+            [ProtoMember(13)]
             public OBJStruct MOUSEOVEROBJ;
-            [ProtoMember(15)]
+            [ProtoMember(14)]
             public UIStruct MOUSEOVERUI;
-            [ProtoMember(16)]
+            [ProtoMember(15)]
             public float? MOUSEWINDOWPOSX;
-            [ProtoMember(17)]
+            [ProtoMember(16)]
             public float? MOUSEWINDOWPOSY;
-            [ProtoMember(18)]
+            [ProtoMember(17)]
             public float? MOUSEWORLDPOSX;
-            [ProtoMember(19)]
+            [ProtoMember(18)]
             public float? MOUSEWORLDPOSY;
-            [ProtoMember(20)]
+            [ProtoMember(19)]
             public float? MOUSEWORLDPOSZ;
-            [ProtoMember(21)]
+            [ProtoMember(20)]
             public NEARBYMONSTERStruct[] NEARBYMONSTERS;
-            [ProtoMember(22)]
+            [ProtoMember(21)]
             public int? RANDOM;
-            [ProtoMember(23)]
+            [ProtoMember(22)]
             public string SCANJOURNALMESSAGE;
-            [ProtoMember(24)]
+            [ProtoMember(23)]
             public float? SCANJOURNALTIME;
-            [ProtoMember(25)]
+            [ProtoMember(24)]
             public bool? TARGETLOADING;
-            [ProtoMember(26)]
+            [ProtoMember(25)]
             public string TARGETTYPE;
-            [ProtoMember(27)]
+            [ProtoMember(26)]
             public float? TIME;
-            [ProtoMember(28)]
+            [ProtoMember(27)]
             public string TOOLTIPTEXT;
-            [ProtoMember(29)]
+            [ProtoMember(28)]
             public float UPDATEFREQUENCY;
         }
         [ProtoMember(7)]

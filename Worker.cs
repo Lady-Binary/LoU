@@ -61,8 +61,7 @@ namespace LoU
         private string tooltipText;
 
         private string loadedMapRegion;
-        Transform[] loadedMapTransforms;
-        Texture2D[] loadedMapTextures;
+        IEnumerable<Renderer> loadedMapTiles;
 
         public void Start()
         {
@@ -131,8 +130,7 @@ namespace LoU
             this.RegisteredKeys = null;
             this.CheckedKeys = null;
             this.loadedMapRegion = null;
-            this.loadedMapTextures = null;
-            this.loadedMapTransforms = null;
+            this.loadedMapTiles = null;
         }
 
         // For backward compatibility with old command implementations - params are always threated as string
@@ -250,16 +248,10 @@ namespace LoU
                             loadedMapRegion = region;
 
                             watch.Start();
-                            loadedMapTransforms = Resources.LoadAll<Transform>($"Prefabs/Minimaps/{loadedMapRegion}/").SelectMany(g => g.transform.Cast<Transform>()).ToArray();
-
-                            Utils.Log($"LoadAll<Transform>({loadedMapRegion}) took {watch.ElapsedMilliseconds.ToString()}ms, {loadedMapTransforms.Length} loaded.");
-                            watch.Reset();
-
-                            watch.Start();
-                            loadedMapTextures = Resources.LoadAll<Texture2D>($"Prefabs/Minimaps/{loadedMapRegion}/");
-
-                            Utils.Log($"LoadAll<Texture2D>({loadedMapRegion}) took {watch.ElapsedMilliseconds.ToString()}ms, {loadedMapTextures.Length} loaded.");
+                            loadedMapTiles = Resources.LoadAll<GameObject>($"Prefabs/Minimaps/{loadedMapRegion}/").SelectMany(go => go.gameObject.GetComponentsInChildren<Renderer>());
                             watch.Stop();
+
+                            Utils.Log($"LoadAll({loadedMapRegion}) took {watch.ElapsedMilliseconds.ToString()}ms, {loadedMapTiles.Count()} loaded.");
 
                             break;
                         }
@@ -271,22 +263,14 @@ namespace LoU
                             string mapDirectory = ExtractParam(ClientCommand.CommandParams, 0);
 
                             watch.Start();
-                            foreach (Transform transform in loadedMapTransforms)
+                            foreach (var mapTile in loadedMapTiles)
                             {
-                                MapExporter.ExportTransform(transform, mapDirectory);
+                                MapExporter.ExportTile(mapTile, mapDirectory);
                             }
-
-                            Utils.Log($"ExportTransform({loadedMapRegion}) took " + watch.ElapsedMilliseconds.ToString() + "ms");
-                            watch.Reset();
-
-                            watch.Start();
-                            foreach (Texture2D texture in loadedMapTextures)
-                            {
-                                MapExporter.ExportTexture2D(texture, mapDirectory);
-                            }
-
-                            Utils.Log($"ExportTexture2D({loadedMapRegion}) took " + watch.ElapsedMilliseconds.ToString() + "ms");
                             watch.Stop();
+
+                            Utils.Log($"ExportTile({loadedMapRegion}) took " + watch.ElapsedMilliseconds.ToString() + "ms");
+
                             break;
                         }
 
@@ -297,8 +281,7 @@ namespace LoU
                             watch.Start();
 
                             loadedMapRegion = null;
-                            loadedMapTransforms = null;
-                            loadedMapTextures = null;
+                            loadedMapTiles = null;
                             Resources.UnloadUnusedAssets();
 
                             Utils.Log("UnloadUnusedAssets() took " + watch.ElapsedMilliseconds.ToString() + "ms");
@@ -1548,8 +1531,7 @@ namespace LoU
                             tooltipText = null;
 
                             loadedMapRegion = null;
-                            loadedMapTextures = null;
-                            loadedMapTransforms = null;
+                            loadedMapTiles = null;
                         }
                         break;
 
@@ -1798,8 +1780,7 @@ namespace LoU
             ClientStatus.Miscellaneous.CUSTOMVARS = this.CustomVars?.ToDictionary(v => v.Key, v => new ClientStatus.CustomVarStruct(v.Value)) ?? null;
 
             ClientStatus.Miscellaneous.LOADEDMAPREGION = this.loadedMapRegion ?? "";
-            ClientStatus.Miscellaneous.LOADEDMAPTRANSFORMS = this.loadedMapTransforms?.Length ?? 0;
-            ClientStatus.Miscellaneous.LOADEDMAPTEXTURES = this.loadedMapTextures?.Length ?? 0;
+            ClientStatus.Miscellaneous.LOADEDMAPTILES = this.loadedMapTiles?.Count() ?? 0;
 
             if (this.player != null)
             {
