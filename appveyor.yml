@@ -74,7 +74,7 @@ after_build:
     $artifact = "LoU-$env:APPVEYOR_BUILD_VERSION.zip"
 
 
-    7z a -tzip $artifact $pwd\LoU\bin\x64\Release\LoU.dll
+    7z a -tzip $artifact $pwd\bin\x64\Release\LoU.dll
 artifacts:
 - path: LoU-$(APPVEYOR_BUILD_VERSION).zip
 deploy:
