@@ -98,7 +98,6 @@ after_deploy:
 
     gren changelog --token $env:GITHUB_TOKEN --override
 
-
     git config --global credential.helper store
 
     Add-Content -Path "$HOME\.git-credentials" -Value "https://$($env:GITHUB_TOKEN):x-oauth-basic@github.com`n" -NoNewline
