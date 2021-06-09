@@ -1899,7 +1899,7 @@ namespace LoU
                             )
                         .Select(f => new ClientStatus.NEARBYMONSTERStruct()
                         {
-                            DISTANCE = Vector3.Distance(f.transform.position, this.player.transform.position),
+                            DISTANCE = f?.transform?.position != null && this.player?.transform?.position != null ? Vector3.Distance(f.transform.position, this.player.transform.position) : 0,
                             HP = f.GetStatByName("Health"),
                             ID = f.ObjectId,
                             NAME = f.EBHEDGHBHGI

@@ -243,7 +243,7 @@ namespace LoU
             if (nearbyMobiles == null || nearbyMobiles.Count() == 0)
                 return foundMobiles;
 
-            IEnumerable<MobileInstance> mobiles = nearbyMobiles.OrderBy(obj => obj?.transform?.position != null && GameObjectSingleton<ApplicationController>.DJCGIMIDOPB?.Player?.transform?.position != null ? Vector3.Distance(obj.transform.position, GameObjectSingleton<ApplicationController>.DJCGIMIDOPB.Player.transform.position) : float.PositiveInfinity);
+            IEnumerable<MobileInstance> mobiles = nearbyMobiles.OrderBy(obj => obj?.transform?.position != null && GameObjectSingleton<ApplicationController>.DJCGIMIDOPB?.Player?.transform?.position != null ? Vector3.Distance(obj.transform.position, GameObjectSingleton<ApplicationController>.DJCGIMIDOPB.Player.transform.position) : 0);
             if (mobiles == null || mobiles.Count() == 0)
                 return foundMobiles;
 
