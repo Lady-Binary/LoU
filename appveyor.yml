@@ -36,7 +36,7 @@ before_build:
 
     $url = "https://cdn.legendsofaria.com/Legends%20of%20Aria-$env:LOA_VERSION.zip"
 
-    $file = "c:\downloads\LegendsOfAria-$env:LOA_VERSION.zip"
+    $file = "c:\downloads\Legends Of Aria-$env:LOA_VERSION.zip"
 
 
     # check if we ever downloaded dlls for the current loa version
