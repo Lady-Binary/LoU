@@ -1816,6 +1816,7 @@ namespace LoU
 
             // Client Info
 
+            ClientStatus.ClientInfo.LOUVER = typeof(Worker).Assembly.GetName().Version.ToString();
             ClientStatus.ClientInfo.CLIVER = ApplicationController.c_clientVersion;
             ClientStatus.ClientInfo.CLIID = this.ProcessId;
             ClientStatus.ClientInfo.CLIXRES = Screen.width;
