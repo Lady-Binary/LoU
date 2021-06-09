@@ -34,7 +34,7 @@ before_build:
     ls c:\downloads
 
 
-    $url = "https://cdn.legendsofaria.com/LegendsOfAria-$env:LOA_VERSION.zip"
+    $url = "https://cdn.legendsofaria.com/Legends%20of%20Aria-$env:LOA_VERSION.zip"
 
     $file = "c:\downloads\LegendsOfAria-$env:LOA_VERSION.zip"
 
