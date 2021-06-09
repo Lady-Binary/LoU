@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace LoU
 {
@@ -60,6 +61,7 @@ namespace LoU
         private ClientObject lastMouseClickClientObject;
         private string tooltipText;
 
+        private string loadedMapScene;
         private string loadedMapRegion;
         IEnumerable<Renderer> loadedMapTiles;
 
@@ -129,6 +131,7 @@ namespace LoU
             this.lastMouseClickClientObject = null;
             this.RegisteredKeys = null;
             this.CheckedKeys = null;
+            this.loadedMapScene = null;
             this.loadedMapRegion = null;
             this.loadedMapTiles = null;
         }
@@ -245,13 +248,79 @@ namespace LoU
                             var watch = new System.Diagnostics.Stopwatch();
 
                             string region = ExtractParam(ClientCommand.CommandParams, 0);
+                            loadedMapScene = null;
                             loadedMapRegion = region;
 
                             watch.Start();
-                            loadedMapTiles = Resources.LoadAll<GameObject>($"Prefabs/Minimaps/{loadedMapRegion}/").SelectMany(go => go.gameObject.GetComponentsInChildren<Renderer>());
-                            watch.Stop();
 
-                            Utils.Log($"LoadAll({loadedMapRegion}) took {watch.ElapsedMilliseconds.ToString()}ms, {loadedMapTiles.Count()} loaded.");
+                            // Search in prefabs first
+                            loadedMapTiles = Resources.LoadAll<GameObject>($"Prefabs/Minimaps/{loadedMapRegion}/").SelectMany(go => go.gameObject.GetComponentsInChildren<Renderer>());
+                            if (loadedMapTiles != null && loadedMapTiles.Count() > 0)
+                            {
+                                // Prefabs found, let's return
+                                watch.Stop();
+                                Utils.Log($"LoadMap({loadedMapRegion}) from prefabs took {watch.ElapsedMilliseconds.ToString()}ms, {loadedMapTiles.Count()} loaded.");
+                                break;
+                            }
+
+                            // Search in prefabs again, but with the "maps" suffix
+                            loadedMapTiles = Resources.LoadAll<GameObject>($"Prefabs/Minimaps/{loadedMapRegion}Maps/").SelectMany(go => go.gameObject.GetComponentsInChildren<Renderer>());
+                            if (loadedMapTiles != null && loadedMapTiles.Count() > 0)
+                            {
+                                // Prefabs found, let's return
+                                watch.Stop();
+                                Utils.Log($"LoadMap({loadedMapRegion} with suffix Maps) from prefabs took {watch.ElapsedMilliseconds.ToString()}ms, {loadedMapTiles.Count()} loaded.");
+                                break;
+                            }
+
+                            // No prefebas were found, this is probably the new Britannia map on LoU,
+                            // we need to search in the streamed scene bundles
+
+                            // Let's see if the scene is already loaded
+                            Scene s = SceneManager.GetSceneByName(region);
+                            if (s != null && s.isLoaded)
+                            {
+                                // Scene already loaded, No need to load it (and then unload it)
+                                Utils.Log("Scene " + region + " already loaded");
+
+                                // Just search for the minimap root object and return the tiles
+                                foreach (var rgo in s.GetRootGameObjects())
+                                {
+                                    if (rgo.name == "UI_all" || rgo.name == "MinimapperRoot")
+                                    {
+                                        loadedMapTiles = rgo.GetComponentsInChildren<Renderer>();
+                                        break;
+                                    }
+                                }
+
+                                watch.Stop();
+                                Utils.Log($"LoadMap({loadedMapRegion}) from scene took {watch.ElapsedMilliseconds.ToString()}ms, {loadedMapTiles.Count()} loaded.");
+                            }
+                            else
+                            {
+                                // We need to load it (and then unload it)
+                                Utils.Log("Scene " + region + " needs to be loaded");
+
+                                UnityEngine.Events.UnityAction<Scene, LoadSceneMode> onSceneLoaded = null;
+                                onSceneLoaded = (Scene _scene, LoadSceneMode _mode) =>
+                                {
+                                    SceneManager.sceneLoaded -= onSceneLoaded;
+                                    foreach (var rgo in _scene.GetRootGameObjects())
+                                    {
+                                        if (rgo.name == "UI_all" || rgo.name == "MinimapperRoot")
+                                        {
+                                            loadedMapTiles = rgo.GetComponentsInChildren<Renderer>();
+                                            Utils.Log($"Scene {loadedMapRegion} loaded, {loadedMapTiles.Count()} loaded.");
+                                        }
+                                    }
+                                };
+                                SceneManager.sceneLoaded += onSceneLoaded;
+                                SceneManager.LoadScene(loadedMapRegion, LoadSceneMode.Additive);
+                                loadedMapScene = loadedMapRegion;
+
+                                watch.Stop();
+                                Utils.Log($"LoadMap({loadedMapRegion}) from scene took {watch.ElapsedMilliseconds.ToString()}ms, tiles still loading.");
+                            }
 
                             break;
                         }
@@ -280,11 +349,18 @@ namespace LoU
 
                             watch.Start();
 
+                            if (loadedMapScene != null)
+                            {
+                                SceneManager.UnloadSceneAsync(loadedMapScene);
+                                Utils.Log($"Unloading scene {loadedMapScene}");
+                            }
+
+                            loadedMapScene = null;
                             loadedMapRegion = null;
                             loadedMapTiles = null;
                             Resources.UnloadUnusedAssets();
 
-                            Utils.Log("UnloadUnusedAssets() took " + watch.ElapsedMilliseconds.ToString() + "ms");
+                            Utils.Log("UnloadMap() took " + watch.ElapsedMilliseconds.ToString() + "ms");
                             watch.Stop();
                             break;
                         }
@@ -1740,6 +1816,7 @@ namespace LoU
 
             // Client Info
 
+            ClientStatus.ClientInfo.LOUVER = typeof(Worker).Assembly.GetName().Version.ToString();
             ClientStatus.ClientInfo.CLIVER = ApplicationController.c_clientVersion;
             ClientStatus.ClientInfo.CLIID = this.ProcessId;
             ClientStatus.ClientInfo.CLIXRES = Screen.width;

@@ -295,12 +295,14 @@ namespace LoU
             [ProtoMember(6)]
             public bool? FULLSCREEN;
             [ProtoMember(7)]
-            public int? MAINCAMERAMASK;
+            public string LOUVER;
             [ProtoMember(8)]
-            public string SERVER;
+            public int? MAINCAMERAMASK;
             [ProtoMember(9)]
-            public int? TARGETFRAMERATE;
+            public string SERVER;
             [ProtoMember(10)]
+            public int? TARGETFRAMERATE;
+            [ProtoMember(11)]
             public int? VSYNCCOUNT;
         }
         [ProtoMember(6)]

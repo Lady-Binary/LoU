@@ -12,6 +12,8 @@ namespace LoU
         public float x;
         public float y;
         public float z;
+        public float height;
+        public float width;
     }
 
     class MapExporter
@@ -82,7 +84,9 @@ namespace LoU
                 Name = texture.name,
                 x = renderer.bounds.center.x,
                 y = renderer.bounds.center.y,
-                z = renderer.bounds.center.z
+                z = renderer.bounds.center.z,
+                height = renderer.bounds.size.x,
+                width = renderer.bounds.size.z
             };
 
             var exportFullName = Path.Combine(mapDirectory, texture.name + "_" + renderer.name);
