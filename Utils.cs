@@ -237,8 +237,16 @@ namespace LoU
         }
         public static List<MobileInstance> FindMobile(string name, float distance)
         {
-            IEnumerable<MobileInstance> mobiles = GetNearbyMobiles(distance).OrderBy(obj => Vector3.Distance(obj.transform.position, GameObjectSingleton<ApplicationController>.DJCGIMIDOPB.Player.transform.position));
             List<MobileInstance> foundMobiles = new List<MobileInstance>();
+
+            IEnumerable<MobileInstance> nearbyMobiles = GetNearbyMobiles(distance);
+            if (nearbyMobiles == null || nearbyMobiles.Count() == 0)
+                return foundMobiles;
+
+            IEnumerable<MobileInstance> mobiles = nearbyMobiles.OrderBy(obj => obj?.transform?.position != null && GameObjectSingleton<ApplicationController>.DJCGIMIDOPB?.Player?.transform?.position != null ? Vector3.Distance(obj.transform.position, GameObjectSingleton<ApplicationController>.DJCGIMIDOPB.Player.transform.position) : float.PositiveInfinity);
+            if (mobiles == null || mobiles.Count() == 0)
+                return foundMobiles;
+
             foreach (MobileInstance mobile in mobiles)
             {
                 if (Vector3.Distance(mobile.transform.position, GameObjectSingleton<ApplicationController>.DJCGIMIDOPB.Player.transform.position) > distance)
