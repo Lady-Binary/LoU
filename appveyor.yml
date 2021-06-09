@@ -67,7 +67,7 @@ before_build:
     ls $pwd\libs\
 
 build:
-  project: c:\LoU\LoU.sln
+  project: c:\LoU\LoU.csproj
   verbosity: minimal
 after_build:
 - ps: >-
