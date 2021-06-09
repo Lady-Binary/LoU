@@ -30,14 +30,11 @@ before_build:
       mkdir c:\downloads
     }
 
-
     ls c:\downloads
-
 
     $url = "https://cdn.legendsofaria.com/Legends%20of%20Aria-$env:LOA_VERSION.zip"
 
     $file = "c:\downloads\Legends of Aria-$env:LOA_VERSION.zip"
-
 
     # check if we ever downloaded dlls for the current loa version
 
@@ -58,7 +55,6 @@ before_build:
       # and recreate the zip with just the dlls, so that appveyor can cache it for subsequent builds
       7z a -tzip $file c:\downloads\*.dll
     }
-
 
     # copy dlls to the libs folder
 
