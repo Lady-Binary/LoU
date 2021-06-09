@@ -36,7 +36,7 @@ before_build:
 
     $url = "https://cdn.legendsofaria.com/Legends%20of%20Aria-$env:LOA_VERSION.zip"
 
-    $file = "c:\downloads\Legends Of Aria-$env:LOA_VERSION.zip"
+    $file = "c:\downloads\Legends of Aria-$env:LOA_VERSION.zip"
 
 
     # check if we ever downloaded dlls for the current loa version
@@ -74,7 +74,7 @@ after_build:
     $artifact = "LoU-$env:APPVEYOR_BUILD_VERSION.zip"
 
 
-    7z a -tzip $artifact $pwd\bin\x64\Release\LoU.dll
+    7z a -tzip $artifact $pwd\bin\Release\LoU.dll
 artifacts:
 - path: LoU-$(APPVEYOR_BUILD_VERSION).zip
 deploy:
