@@ -1322,10 +1322,19 @@ namespace LoU
                             if (_objectId != null && ulong.TryParse(_objectId, out ulong objectId))
                             {
                                 Utils.Log("Trying by object id");
-                                MobileInstance mobile = Utils.GetMobile(objectId);
-                                if (mobile != null)
+                                try
                                 {
-                                    mobiles.Add(mobile);
+                                    MobileInstance mobile = Utils.GetMobile(objectId);
+                                    if (mobile != null)
+                                    {
+                                        mobiles.Add(mobile);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    this.FindMobileResults = null;
+                                    Utils.Log("Error finding mobile by objectId!");
+                                    Utils.Log(ex.ToString());
                                 }
                             }
                             else
@@ -1335,11 +1344,29 @@ namespace LoU
                                 string _distance = ExtractParam(ClientCommand.CommandParams, 1);
                                 if (_distance != null && _distance != "" && float.TryParse(_distance, out float distance))
                                 {
-                                    mobiles = Utils.FindMobile(name, distance);
+                                    try
+                                    {
+                                        mobiles = Utils.FindMobile(name, distance);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        this.FindMobileResults = null;
+                                        Utils.Log("Error finding mobile by name and distance!");
+                                        Utils.Log(ex.ToString());
+                                    }
                                 }
                                 else
                                 {
-                                    mobiles = Utils.FindMobile(name);
+                                    try
+                                    {
+                                        mobiles = Utils.FindMobile(name);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        this.FindMobileResults = null;
+                                        Utils.Log("Error finding mobile by name!");
+                                        Utils.Log(ex.ToString());
+                                    }
                                 }
                             }
 
@@ -1872,7 +1899,7 @@ namespace LoU
                             )
                         .Select(f => new ClientStatus.NEARBYMONSTERStruct()
                         {
-                            DISTANCE = Vector3.Distance(f.transform.position, this.player.transform.position),
+                            DISTANCE = f?.transform?.position != null && this.player?.transform?.position != null ? Vector3.Distance(f.transform.position, this.player.transform.position) : 0,
                             HP = f.GetStatByName("Health"),
                             ID = f.ObjectId,
                             NAME = f.EBHEDGHBHGI
