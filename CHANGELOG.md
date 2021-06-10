@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0.2 (10/06/2021)
+*No changelog for this release.*
+
+---
+
 ## 1.3.0.1 (10/06/2021)
 - [**closed**] Sometimes FindMobile stops working [#19](https://github.com/Lady-Binary/LoU/issues/19)
 
