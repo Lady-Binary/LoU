@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0.4 (10/06/2021)
+- [**closed**] Enforce x64 build [#22](https://github.com/Lady-Binary/LoU/issues/22)
+
+---
+
 ## 1.3.0.3 (10/06/2021)
 *No changelog for this release.*
 
