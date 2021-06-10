@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0.3 (10/06/2021)
+*No changelog for this release.*
+
+---
+
 ## 1.3.0.2 (10/06/2021)
 *No changelog for this release.*
 
