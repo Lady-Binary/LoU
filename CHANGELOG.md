@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0.1 (10/06/2021)
+- [**closed**] Sometimes FindMobile stops working [#19](https://github.com/Lady-Binary/LoU/issues/19)
+
+---
+
 ## 1.3.0.0 (09/06/2021)
 - [**closed**] Add support for Legends of Ultima Britannia maps [#17](https://github.com/Lady-Binary/LoU/issues/17)
 - [**closed**] New status variable for checking LoU.dll version [#16](https://github.com/Lady-Binary/LoU/issues/16)
