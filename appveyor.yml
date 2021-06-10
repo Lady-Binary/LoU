@@ -9,6 +9,7 @@ skip_commits:
   message: /bump version and update changelog/
 image: Visual Studio 2017
 configuration: Release
+platform: x64
 clone_folder: c:\LoU
 install:
   - git submodule update --init --recursive
