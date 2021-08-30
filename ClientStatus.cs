@@ -396,18 +396,22 @@ namespace LoU
             [ProtoMember(21)]
             public int? RANDOM;
             [ProtoMember(22)]
-            public string SCANJOURNALMESSAGE;
+            public string SCANCHATJOURNALMESSAGE;
             [ProtoMember(23)]
-            public float? SCANJOURNALTIME;
+            public float? SCANCHATJOURNALTIME;
             [ProtoMember(24)]
-            public bool? TARGETLOADING;
+            public string SCANSYSTEMJOURNALMESSAGE;
             [ProtoMember(25)]
-            public string TARGETTYPE;
+            public float? SCANSYSTEMJOURNALTIME;
             [ProtoMember(26)]
-            public float? TIME;
+            public bool? TARGETLOADING;
             [ProtoMember(27)]
-            public string TOOLTIPTEXT;
+            public string TARGETTYPE;
             [ProtoMember(28)]
+            public float? TIME;
+            [ProtoMember(29)]
+            public string TOOLTIPTEXT;
+            [ProtoMember(30)]
             public float UPDATEFREQUENCY;
         }
         [ProtoMember(7)]
