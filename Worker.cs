@@ -48,8 +48,11 @@ namespace LoU
 
         private Dictionary<String, object> CustomVars;
 
-        private float ScanJournalTime;
-        private string ScanJournalMessage;
+        private float ScanSystemJournalTime;
+        private string ScanSystemJournalMessage;
+
+        private float ScanChatJournalTime;
+        private string ScanChatJournalMessage;
 
         private HashSet<String> RegisteredKeys = new HashSet<String>();
         Dictionary<string, bool> CheckedKeys = new Dictionary<string, bool>();
@@ -1060,7 +1063,7 @@ namespace LoU
                         }
                         break;
 
-                    case CommandType.ScanJournal:
+                    case CommandType.ScanSystemJournal:
                         {
                             if (this.applicationController?.GameUI?.ChatWindow != null)
                             {
@@ -1071,16 +1074,44 @@ namespace LoU
                                     List<ChatWindow.AEDJOHFMLDG> MEMFCHFEKPN = (List<ChatWindow.AEDJOHFMLDG>)Utils.GetInstanceField(this.applicationController.GameUI.ChatWindow, "MEMFCHFEKPN");
                                     if (MEMFCHFEKPN != null)
                                     {
-                                        ChatWindow.AEDJOHFMLDG message = MEMFCHFEKPN.FindLast(m => m.KCFOFGNMOBE >= timeStamp + 0.001f);
+                                        ChatWindow.AEDJOHFMLDG message = MEMFCHFEKPN.FindLast(m => m.KCFOFGNMOBE > timeStamp);
                                         if (message != null)
                                         {
-                                            this.ScanJournalMessage = message.PIIMGFNGPEI;
-                                            this.ScanJournalTime = message.KCFOFGNMOBE;
+                                            this.ScanSystemJournalMessage = message.PIIMGFNGPEI;
+                                            this.ScanSystemJournalTime = message.KCFOFGNMOBE;
                                         }
                                         else
                                         {
-                                            this.ScanJournalMessage = "N/A";
-                                            this.ScanJournalTime = 0;
+                                            this.ScanSystemJournalMessage = "N/A";
+                                            this.ScanSystemJournalTime = 0;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        break;
+
+                    case CommandType.ScanChatJournal:
+                        {
+                            if (this.applicationController?.GameUI?.ChatWindow != null)
+                            {
+                                string _timeStamp = ExtractParam(ClientCommand.CommandParams, 0);
+                                if (_timeStamp != null && _timeStamp != "" && float.TryParse(_timeStamp, out float timeStamp))
+                                {
+                                    // Obfuscation guessed from GameUI.ChatWindow.SystemMessage()
+                                    List<ChatWindow.AEDJOHFMLDG> CEIMNNOCJHM = (List<ChatWindow.AEDJOHFMLDG>)Utils.GetInstanceField(this.applicationController.GameUI.ChatWindow, "CEIMNNOCJHM");
+                                    if (CEIMNNOCJHM != null)
+                                    {
+                                        ChatWindow.AEDJOHFMLDG message = CEIMNNOCJHM.FindLast(m => !m.PIIMGFNGPEI.StartsWith("[System] ") && m.KCFOFGNMOBE > timeStamp);
+                                        if (message != null)
+                                        {
+                                            this.ScanChatJournalMessage = message.PIIMGFNGPEI;
+                                            this.ScanChatJournalTime = message.KCFOFGNMOBE;
+                                        }
+                                        else
+                                        {
+                                            this.ScanChatJournalMessage = "N/A";
+                                            this.ScanChatJournalTime = 0;
                                         }
                                     }
                                 }
@@ -1623,8 +1654,8 @@ namespace LoU
 
                             CustomVars = null;
 
-                            ScanJournalTime = 0;
-                            ScanJournalMessage = null;
+                            ScanSystemJournalTime = 0;
+                            ScanSystemJournalMessage = null;
 
                             leftMouseDown = false;
                             rightMouseDown = false;
@@ -1963,8 +1994,10 @@ namespace LoU
 
             ClientStatus.Miscellaneous.RANDOM = new System.Random().Next(0, 1000);
 
-            ClientStatus.Miscellaneous.SCANJOURNALTIME = this.ScanJournalTime;
-            ClientStatus.Miscellaneous.SCANJOURNALMESSAGE = this.ScanJournalMessage;
+            ClientStatus.Miscellaneous.SCANCHATJOURNALTIME = this.ScanChatJournalTime;
+            ClientStatus.Miscellaneous.SCANCHATJOURNALMESSAGE = this.ScanChatJournalMessage;
+            ClientStatus.Miscellaneous.SCANSYSTEMJOURNALTIME = this.ScanSystemJournalTime;
+            ClientStatus.Miscellaneous.SCANSYSTEMJOURNALMESSAGE = this.ScanSystemJournalMessage;
 
             if (inputController != null)
             {
