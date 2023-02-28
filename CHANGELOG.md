@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0.6 (28/02/2023)
+- [**closed**] New ScanChatJournal and ScanSystemJournal commands [#23](https://github.com/Lady-Binary/LoU/issues/23)
+
+---
+
 ## 1.3.0.4 (10/06/2021)
 - [**closed**] Enforce x64 build [#22](https://github.com/Lady-Binary/LoU/issues/22)
 
